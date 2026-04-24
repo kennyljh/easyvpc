@@ -1,0 +1,6 @@
+QPushButton {
+    padding: 10px 15px;
+}
+QComboBox {
+    padding: 10px 15px;
+}
