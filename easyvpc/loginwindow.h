@@ -13,7 +13,7 @@
 class LoginWindow : public QMainWindow{
     Q_OBJECT
     public:
-        explicit LoginWindow(QWidget *parent  = 0);
+        explicit LoginWindow(QWidget *parent = 0);
 
     private:
         QStringList *foundProfiles;
@@ -31,9 +31,11 @@ class LoginWindow : public QMainWindow{
         QPushButton *goBtn;
 
         void getAWSProfiles(QStringList &profiles);
+        void loginAWSProfile(QString selectedProfile);
 
     private slots:
         void loginButtonClicked();
+        void goButtonClicked();
 };
 
 #endif // LOGINWINDOW_H

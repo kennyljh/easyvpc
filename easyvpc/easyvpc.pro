@@ -7,10 +7,14 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 SOURCES += \
     main.cpp \
-    loginwindow.cpp
+    loginwindow.cpp \
+    vpccard.cpp \
+    vpcwindow.cpp
 
 HEADERS += \
-    loginwindow.h
+    loginwindow.h \
+    vpccard.h \
+    vpcwindow.h
 
 RESOURCES += \
     resources.qrc

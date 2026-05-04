@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QProcess>
 
 LoginWindow::LoginWindow(QWidget *parent) : QMainWindow(parent){
 
@@ -37,6 +38,7 @@ LoginWindow::LoginWindow(QWidget *parent) : QMainWindow(parent){
                             profilesCBox = new QComboBox(CBoxBtnWindow);
                             profilesCBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
                             goBtn = new QPushButton("Go", CBoxBtnWindow);
+                            connect(goBtn, &QPushButton::clicked, this, &LoginWindow::goButtonClicked);
                         CBoxBtnLayout->addWidget(profilesCBox, 0);
                         CBoxBtnLayout->addWidget(goBtn, 0);
                 selectProfileLayout->addWidget(profilesLineEdt, 0);
@@ -59,6 +61,22 @@ void LoginWindow::loginButtonClicked(){
     }
 }
 
+void LoginWindow::goButtonClicked(){
+
+    loginAWSProfile(profilesCBox->currentText());
+}
+
+void LoginWindow::loginAWSProfile(QString selectedProfile){
+
+    QProcess::execute("aws", {"sso", "login", "--profile", selectedProfile});
+    // todo - need to add finished() signal for window switching
+}
+
+/**
+ * @brief LoginWindow::getAWSProfiles Begins async QProcess to login selected
+ * AWS profile
+ * @param profiles
+ */
 void LoginWindow::getAWSProfiles(QStringList &profiles){
 
     QString configPath = QDir::homePath() + "/.aws/config";
