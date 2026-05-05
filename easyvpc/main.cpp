@@ -1,7 +1,8 @@
 #include <QApplication>
-#include "loginwindow.h"
 #include <vpcwindow.h>
 #include <QFile>
+#include "loginwindow.h"
+#include "awsmanager.h"
 
 int main(int argc, char *argv[]){
 
@@ -9,6 +10,9 @@ int main(int argc, char *argv[]){
 
     QFile file(":/styles/styles.qss");
     if (file.open(QFile::ReadOnly)) app.setStyleSheet(QLatin1String(file.readAll()));
+
+    AWSManager::instance().initSDK();
+    AWSManager::instance().setSelectedProfile("testing-profile");
 
     // LoginWindow loginWindow;
     // loginWindow.show();

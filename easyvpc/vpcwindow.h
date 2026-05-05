@@ -25,6 +25,7 @@ class VPCWindow : public QMainWindow{
         QFrame *myVPCBarFrame;
         QHBoxLayout *myVPCBarLayout;
         QLabel *welcomeName;
+        QPushButton *refreshBtn;
         QPushButton *sortBtn;
         QPushButton *expandAllBtn;
 
@@ -34,6 +35,7 @@ class VPCWindow : public QMainWindow{
 
         void processVPCs();
     private slots:
+        void refreshButtonClicked();
 };
 
 #endif // VPCWINDOW_H

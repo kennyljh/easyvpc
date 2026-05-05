@@ -6,12 +6,14 @@ QT = core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 SOURCES += \
+    awsmanager.cpp \
     main.cpp \
     loginwindow.cpp \
     vpccard.cpp \
     vpcwindow.cpp
 
 HEADERS += \
+    awsmanager.h \
     loginwindow.h \
     vpccard.h \
     vpcwindow.h

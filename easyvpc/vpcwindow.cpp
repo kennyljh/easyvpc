@@ -5,9 +5,11 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QFont>
+#include <vector>
 #include "vpccard.h"
+#include "awsmanager.h"
 #include <aws/core/Aws.h>
-#include <aws/core/auth/AWSCredentialsProviderChain.h>
+#include <aws/ec2/EC2Client.h>
 
 VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
 
@@ -17,7 +19,7 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
     centralLayout = new QVBoxLayout(centralWindow);
 
         topBarFrame = new QFrame(centralWindow);
-        topBarFrame->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
+        topBarFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
         topBarLayout = new QHBoxLayout(topBarFrame);
             backToHubBtn = new QPushButton("EasyVPC", topBarFrame);
             regionsCBox = new QComboBox(topBarFrame);
@@ -32,10 +34,13 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
             qfont.setBold(true);
             qfont.setPointSize(22);
             welcomeName->setFont(qfont);
+            refreshBtn = new QPushButton("Refresh", myVPCBarFrame);
+            connect(refreshBtn, &QPushButton::clicked, this, &VPCWindow::refreshButtonClicked);
             sortBtn = new QPushButton("Sort", myVPCBarFrame);
             expandAllBtn = new QPushButton("Expand All", myVPCBarFrame);
         myVPCBarLayout->addWidget(welcomeName);
         myVPCBarLayout->addStretch();
+        myVPCBarLayout->addWidget(refreshBtn);
         myVPCBarLayout->addWidget(sortBtn);
         myVPCBarLayout->addWidget(expandAllBtn);
 
@@ -44,13 +49,6 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
             // myVPCWindow->setStyleSheet("border: 1px solid green");
             myVPCLayout = new QVBoxLayout(myVPCWindow);
             myVPCLayout->setAlignment(Qt::AlignTop);
-                myVPCLayout->addWidget(new VPCCard("temp", "123456", "10.2.4.5"));
-                myVPCLayout->addWidget(new VPCCard("temp2", "123456", "10.2.4.5"));
-                myVPCLayout->addWidget(new VPCCard("temp2", "123456", "10.2.4.5"));
-                myVPCLayout->addWidget(new VPCCard("temp2", "123456", "10.2.4.5"));
-                myVPCLayout->addWidget(new VPCCard("temp2", "123456", "10.2.4.5"));
-                myVPCLayout->addWidget(new VPCCard("temp2", "123456", "10.2.4.5"));
-                myVPCLayout->addWidget(new VPCCard("temp2", "123456", "10.2.4.5"));
         myVPCScrollArea->setWidget(myVPCWindow);
         myVPCScrollArea->setWidgetResizable(true);
         myVPCScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -59,9 +57,37 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
     centralLayout->addWidget(myVPCScrollArea, 1);
 
     setCentralWidget(centralWindow);
-
 }
 
 void VPCWindow::processVPCs(){
 
+    std::vector<Aws::EC2::Model::Vpc> vpcs = AWSManager::instance().getVPCs(
+                                                AWSManager::instance().getSelectedProfile()
+                                            );
+
+    QLayoutItem *item;
+    while ((item = myVPCLayout->takeAt(0)) != nullptr){
+        if (QWidget *widget = item->widget()) widget->deleteLater();
+        delete item;
+    }
+
+    for (Aws::EC2::Model::Vpc &vpc : vpcs){
+
+        QString name = "default VPC";
+        for (const auto& tag : vpc.GetTags()){
+            if (tag.GetKey() == "Name") name = QString::fromStdString(tag.GetValue());
+        }
+        QString id = QString::fromStdString(vpc.GetVpcId());
+        QString ipv4cidr = QString::fromStdString(vpc.GetCidrBlock());
+        QString state = QString::fromStdString(
+                            Aws::EC2::Model::VpcStateMapper::GetNameForVpcState(vpc.GetState())
+                        );
+        qDebug() << "VPC found: " + name + " " + id + " " + ipv4cidr + " " + state;
+
+        myVPCLayout->addWidget(new VPCCard(name, id, ipv4cidr, state, myVPCWindow));
+    }
+}
+
+void VPCWindow::refreshButtonClicked(){
+    processVPCs();
 }

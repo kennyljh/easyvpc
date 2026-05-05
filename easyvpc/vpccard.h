@@ -14,11 +14,13 @@ class VPCCard : public QFrame{
     Q_OBJECT
     public:
         explicit VPCCard(const QString &name, const QString &id,
-                            const QString &ipv4cidr, QWidget *parent = nullptr);
+                            const QString &ipv4cidr, const QString &state,
+                            QWidget *parent = nullptr);
     private:
         QString *name;
         QString *id;
         QString *ipv4cidr;
+        QString *state;
         QStringList *subnets;
         QStringList *routeTables;
         QStringList *internetGateways;
@@ -33,6 +35,7 @@ class VPCCard : public QFrame{
         QLabel *vpcName;
         QLabel *vpcID;
         QLabel *vpcIPv4CIDR;
+        QLabel *vpcState;
 
         // void expandCard();
     private slots:

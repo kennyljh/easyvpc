@@ -8,7 +8,8 @@
 #include <QLabel>
 
 VPCCard::VPCCard(const QString &name, const QString &id,
-                            const QString &ipv4cidr, QWidget *parent)
+                            const QString &ipv4cidr, const QString &state,
+                            QWidget *parent)
         : QFrame (parent) {
 
     setFrameStyle(QFrame::Panel | QFrame::Raised);
@@ -26,12 +27,13 @@ VPCCard::VPCCard(const QString &name, const QString &id,
         vpcTitleLayout->addStretch();
         vpcTitleLayout->addWidget(expandBtn);
         vpcTitleLayout->addWidget(deleteBtn);
-
         vpcID = new QLabel("VPC ID: " + id, this);
         vpcIPv4CIDR = new QLabel("IPv4 CIDR: " + ipv4cidr, this);
+        vpcState = new QLabel("VPC State: " + state, this);
     vpcFrameLayout->addWidget(vpcTitleFrame);
     vpcFrameLayout->addWidget(vpcID);
     vpcFrameLayout->addWidget(vpcIPv4CIDR);
+    vpcFrameLayout->addWidget(vpcState);
 
     setFixedHeight(150);
 }

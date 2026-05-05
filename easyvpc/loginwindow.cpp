@@ -70,6 +70,7 @@ void LoginWindow::loginAWSProfile(QString selectedProfile){
 
     QProcess::execute("aws", {"sso", "login", "--profile", selectedProfile});
     // todo - need to add finished() signal for window switching
+    // todo - need to init sdk
 }
 
 /**
