@@ -23,10 +23,9 @@ class VPCCard : public QFrame{
         QStringList *routeTables;
         QStringList *internetGateways;
 
-        QWidget *vpcFrameWindow;
         QVBoxLayout *vpcFrameLayout;
 
-        QWidget *vpcTitleWindow;
+        QFrame *vpcTitleFrame;
         QHBoxLayout *vpcTitleLayout;
 
         QPushButton *expandBtn;
@@ -35,9 +34,10 @@ class VPCCard : public QFrame{
         QLabel *vpcID;
         QLabel *vpcIPv4CIDR;
 
-        void expandCard();
+        // void expandCard();
     private slots:
-        void expandTriggered();
+        // void expandTriggered();
+        // void deleteButtonClicked();
 };
 
 #endif // VPCCARD_H
