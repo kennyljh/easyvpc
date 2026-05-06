@@ -33,7 +33,7 @@ class VPCWindow : public QMainWindow{
             std::vector<Aws::EC2::Model::NetworkAcl> acls;
         };
 
-        QMap<QString, vpcDetails> vpcCache;
+        QMap<QString, vpcDetails*> vpcCache;
 
         QWidget *centralWindow;
         QVBoxLayout *centralLayout;
@@ -68,6 +68,8 @@ class VPCWindow : public QMainWindow{
          * @param msg
          */
         void setStatusBar(QString msg);
+
+        void applyWidgetFade(QWidget *widget);
 
     private slots:
         void refreshButtonClicked();

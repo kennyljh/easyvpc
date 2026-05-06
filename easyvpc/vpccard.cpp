@@ -6,9 +6,9 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QFont>
+#include <QDebug>
 #include <awsmanager.h>
 #include <subnetcard.h>
-#include <QDebug>
 
 VPCCard::VPCCard(const QString &name, const QString &id,
                             const QString &ipv4cidr, const QString &state,
@@ -25,6 +25,7 @@ VPCCard::VPCCard(const QString &name, const QString &id,
     setMidLineWidth(3);
 
     vpcFrameLayout = new QVBoxLayout(this);
+    vpcFrameLayout->setAlignment(Qt::AlignTop);
         vpcTitleFrame = new QFrame(this);
         // vpcTitleFrame->setObjectName("123456");
         // vpcTitleFrame->setStyleSheet("#123456 {border: 1px solid red;}");
@@ -37,7 +38,7 @@ VPCCard::VPCCard(const QString &name, const QString &id,
             expandBtn = new QPushButton("Expand", vpcTitleFrame);
             connect(expandBtn, &QPushButton::clicked, this, &VPCCard::vpcExpandTriggered);
             deleteBtn = new QPushButton("Delete", vpcTitleFrame);
-            deleteBtn->setStyleSheet("color: #ff2929");
+            deleteBtn->setStyleSheet("color: #ff1414");
         vpcTitleLayout->addWidget(vpcName);
         vpcTitleLayout->addStretch();
         vpcTitleLayout->addWidget(expandBtn);
@@ -90,6 +91,8 @@ void VPCCard::expandCard(){
 
 void VPCCard::processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets){
 
+    if (subnets.empty()) return;
+
     // since each instance of VPCCard is connected to the signal, all of them
     // will be prompted to update subnets frame. This check is necessary
     // to ensure that the correct subnet frame is updated, otherwise
@@ -115,9 +118,10 @@ void VPCCard::processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets
                     ", " + ipAddrCount + ", " + zoneID + ", " + zone +
                     ", " + state;
 
-        subnetsLayout->addWidget(new SubnetCard(name, id, ipv4cidr,
-                                                    ipAddrCount, zoneID, zone,
-                                                    state, subnetMainFrame));
+        SubnetCard *card = new SubnetCard(name, id, ipv4cidr,
+                                        ipAddrCount, zoneID, zone,
+                                        state, subnetMainFrame);
+        subnetsLayout->addWidget(card);
         // todo - caching subnets
     }
 }

@@ -1,6 +1,4 @@
-QPushButton {
-    padding: 10px 15px;
-}
-QComboBox {
-    padding: 10px 15px;
+QFrame#blueQFrame {
+    border: 1px solid #4287f5;
+    border-radius: 5px;
 }

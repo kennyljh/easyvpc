@@ -6,6 +6,8 @@
 #include <QFont>
 #include <QStatusBar>
 #include <vector>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
 #include "vpccard.h"
 #include "awsmanager.h"
 #include <aws/core/Aws.h>
@@ -102,14 +104,16 @@ void VPCWindow::processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs){
                         );
         qDebug() << "VPC found: " + name + " " + id + " " + ipv4cidr + " " + state;
 
-        myVPCLayout->addWidget(new VPCCard(name, id, ipv4cidr, state, myVPCWindow));
+        VPCCard *card = new VPCCard(name, id, ipv4cidr, state, myVPCWindow);
+        myVPCLayout->addWidget(card);
+        applyWidgetFade(card);
 
         // vpc caching
-        vpcDetails detail;
-        detail.name = name;
-        detail.id = id;
-        detail.ipv4cidr = ipv4cidr;
-        detail.state = state;
+        vpcDetails *detail = new vpcDetails;
+        detail->name = name;
+        detail->id = id;
+        detail->ipv4cidr = ipv4cidr;
+        detail->state = state;
         vpcCache.insert(id, detail);
     }
     statusBar()->showMessage("Found " + QString::number(vpcs.size()) + " VPCs");
@@ -117,6 +121,18 @@ void VPCWindow::processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs){
 
 void VPCWindow::setStatusBar(QString msg){
     statusBar()->showMessage(msg);
+}
+
+void VPCWindow::applyWidgetFade(QWidget *widget){
+
+    QGraphicsOpacityEffect *opacityEffect = new QGraphicsOpacityEffect(widget);
+    widget->setGraphicsEffect(opacityEffect);
+
+    QPropertyAnimation *fade = new QPropertyAnimation(opacityEffect, "opacity");
+    fade->setDuration(400);
+    fade->setStartValue(0.0);
+    fade->setEndValue(1.0);
+    fade->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void VPCWindow::refreshButtonClicked(){
