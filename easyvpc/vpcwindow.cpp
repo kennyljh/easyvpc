@@ -6,10 +6,9 @@
 #include <QFont>
 #include <QStatusBar>
 #include <vector>
-#include <QGraphicsOpacityEffect>
-#include <QPropertyAnimation>
 #include "vpccard.h"
 #include "awsmanager.h"
+#include "guiutil.h"
 #include <aws/core/Aws.h>
 #include <aws/ec2/EC2Client.h>
 
@@ -106,7 +105,8 @@ void VPCWindow::processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs){
 
         VPCCard *card = new VPCCard(name, id, ipv4cidr, state, myVPCWindow);
         myVPCLayout->addWidget(card);
-        applyWidgetFade(card);
+        GUIUtil util;
+        util.applyWidgetFade(card, 300);
 
         // vpc caching
         vpcDetails *detail = new vpcDetails;
@@ -121,23 +121,6 @@ void VPCWindow::processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs){
 
 void VPCWindow::setStatusBar(QString msg){
     statusBar()->showMessage(msg);
-}
-
-void VPCWindow::applyWidgetFade(QWidget *widget){
-
-    QGraphicsOpacityEffect *opacityEffect = new QGraphicsOpacityEffect(widget);
-    widget->setGraphicsEffect(opacityEffect);
-
-    QPropertyAnimation *fade = new QPropertyAnimation(opacityEffect, "opacity");
-    fade->setDuration(400);
-    fade->setStartValue(0.0);
-    fade->setEndValue(1.0);
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
-
-    connect(fade, &QPropertyAnimation::finished,
-            [=](){
-                widget->setGraphicsEffect(nullptr);
-            });
 }
 
 void VPCWindow::refreshButtonClicked(){

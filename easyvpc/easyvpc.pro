@@ -7,6 +7,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 SOURCES += \
     awsmanager.cpp \
+    guiutil.cpp \
     main.cpp \
     loginwindow.cpp \
     subnetcard.cpp \
@@ -15,6 +16,7 @@ SOURCES += \
 
 HEADERS += \
     awsmanager.h \
+    guiutil.h \
     loginwindow.h \
     subnetcard.h \
     vpccard.h \

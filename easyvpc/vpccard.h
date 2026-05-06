@@ -28,9 +28,11 @@ class VPCCard : public QFrame{
         QVBoxLayout *vpcFrameLayout;
 
         QFrame *vpcTitleFrame;
+        QFrame *titleHLine;
         QHBoxLayout *vpcTitleLayout;
 
         QPushButton *expandBtn;
+        QPushButton *minimizeBtn;
         QPushButton *deleteBtn;
         QLabel *vpcName;
 
@@ -70,6 +72,8 @@ class VPCCard : public QFrame{
          * detailed view
          */
         void vpcExpandTriggered();
+
+        void vpcMinimizeTriggered();
         // void deleteButtonClicked();
 };
 

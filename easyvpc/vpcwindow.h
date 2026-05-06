@@ -69,8 +69,6 @@ class VPCWindow : public QMainWindow{
          */
         void setStatusBar(QString msg);
 
-        void applyWidgetFade(QWidget *widget);
-
     private slots:
         void refreshButtonClicked();
 };

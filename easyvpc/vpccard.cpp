@@ -7,10 +7,10 @@
 #include <QLabel>
 #include <QFont>
 #include <QDebug>
-#include <QGraphicsOpacityEffect>
-#include <QPropertyAnimation>
-#include <awsmanager.h>
-#include <subnetcard.h>
+#include <QLayoutItem>
+#include "awsmanager.h"
+#include "subnetcard.h"
+#include "guiutil.h"
 
 VPCCard::VPCCard(const QString &name, const QString &id,
                             const QString &ipv4cidr, const QString &state,
@@ -39,16 +39,20 @@ VPCCard::VPCCard(const QString &name, const QString &id,
             vpcName->setFont(qfont);
             expandBtn = new QPushButton("Expand", vpcTitleFrame);
             connect(expandBtn, &QPushButton::clicked, this, &VPCCard::vpcExpandTriggered);
+            minimizeBtn = new QPushButton("Minimize", vpcTitleFrame);
+            connect(minimizeBtn, &QPushButton::clicked, this, &VPCCard::vpcMinimizeTriggered);
+            minimizeBtn->hide();
             deleteBtn = new QPushButton("Delete", vpcTitleFrame);
             deleteBtn->setStyleSheet("color: #ff1414");
         vpcTitleLayout->addWidget(vpcName);
         vpcTitleLayout->addStretch();
         vpcTitleLayout->addWidget(expandBtn);
+        vpcTitleLayout->addWidget(minimizeBtn);
         vpcTitleLayout->addWidget(deleteBtn);
-        QFrame *hline = new QFrame(this);
+        titleHLine = new QFrame(this);
         vpcDetailsFrame = new QFrame(this);
         vpcDetailsLayout = new QHBoxLayout(vpcDetailsFrame);
-            hline->setFrameStyle(QFrame::HLine | QFrame::Raised);
+            titleHLine ->setFrameStyle(QFrame::HLine | QFrame::Raised);
             vpcIDLabel = new QLabel("VPC ID: " + id, this);
             vpcIPv4CIDRLabel = new QLabel("IPv4 CIDR: " + ipv4cidr, this);
             vpcStateLabel = new QLabel("VPC State: " + state, this);
@@ -56,11 +60,13 @@ VPCCard::VPCCard(const QString &name, const QString &id,
         vpcDetailsLayout->addWidget(vpcIPv4CIDRLabel, 1);
         vpcDetailsLayout->addWidget(vpcStateLabel);
     vpcFrameLayout->addWidget(vpcTitleFrame);
-    vpcFrameLayout->addWidget(hline);
+    vpcFrameLayout->addWidget(titleHLine );
     vpcFrameLayout->addWidget(vpcDetailsFrame);
 }
 
 void VPCCard::expandCard(){
+
+    GUIUtil util;
 
     subnetMainFrame = new QFrame(this);
     subnetMainLayout = new QVBoxLayout(subnetMainFrame);
@@ -86,6 +92,8 @@ void VPCCard::expandCard(){
     subnetMainLayout->addWidget(subnetTopFrame);
     subnetMainLayout->addWidget(subnetScrollArea);
 
+    util.applyWidgetFade(subnetMainFrame, 300);
+
     // todo - expand other frames as well
 
     vpcFrameLayout->addWidget(subnetMainFrame);
@@ -100,6 +108,12 @@ void VPCCard::processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets
     // to ensure that the correct subnet frame is updated, otherwise
     // may encounter nullptr error
     if (vpcID != subnets.front().GetVpcId()) return;
+
+    QLayoutItem *item;
+    while ((item = subnetsLayout->takeAt(0)) != nullptr){
+        if (QWidget *widget = item->widget()) widget->deleteLater();
+        delete item;
+    }
 
     for (const Aws::EC2::Model::Subnet &subnet : subnets){
 
@@ -124,25 +138,16 @@ void VPCCard::processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets
                                         ipAddrCount, zoneID, zone,
                                         state, subnetMainFrame);
         subnetsLayout->addWidget(card);
-
-        QGraphicsOpacityEffect *opacityEffect = new QGraphicsOpacityEffect(card);
-        card->setGraphicsEffect(opacityEffect);
-
-        QPropertyAnimation *fade = new QPropertyAnimation(opacityEffect, "opacity");
-        fade->setDuration(400);
-        fade->setStartValue(0.0);
-        fade->setEndValue(1.0);
-        fade->start(QAbstractAnimation::DeleteWhenStopped);
-
-        connect(fade, &QPropertyAnimation::finished,
-                [=](){
-                    card->setGraphicsEffect(nullptr);
-            });
+        GUIUtil util;
+        util.applyWidgetFade(card, 300);
         // todo - caching subnets
     }
 }
 
 void VPCCard::vpcExpandTriggered(){
+
+    expandBtn->hide();
+    minimizeBtn->show();
 
     // fill up with placeholder frame first
     expandCard();
@@ -151,4 +156,25 @@ void VPCCard::vpcExpandTriggered(){
     AWSManager::instance().getSubnetsAsync(vpcID);
 
     //todo - add other async calls
+}
+
+void VPCCard::vpcMinimizeTriggered(){
+
+    minimizeBtn->hide();
+    expandBtn->show();
+
+    for (int i = vpcFrameLayout->count() - 1; i >= 0; i--){
+
+        QLayoutItem *item = vpcFrameLayout->itemAt(i);
+        QWidget *widget = item->widget();
+
+        if (widget == vpcTitleFrame ||
+            widget == titleHLine ||
+            widget == vpcDetailsFrame) continue;
+
+        item = vpcFrameLayout->takeAt(i);
+
+        if (widget) widget->deleteLater();
+        delete item;
+    }
 }
