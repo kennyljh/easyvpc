@@ -17,14 +17,6 @@ class VPCCard : public QFrame{
                             const QString &ipv4cidr, const QString &state,
                             QWidget *parent = nullptr);
     private:
-        QString *name;
-        QString *id;
-        QString *ipv4cidr;
-        QString *state;
-        QStringList *subnets;
-        QStringList *routeTables;
-        QStringList *internetGateways;
-
         QVBoxLayout *vpcFrameLayout;
 
         QFrame *vpcTitleFrame;
@@ -33,9 +25,21 @@ class VPCCard : public QFrame{
         QPushButton *expandBtn;
         QPushButton *deleteBtn;
         QLabel *vpcName;
-        QLabel *vpcID;
-        QLabel *vpcIPv4CIDR;
-        QLabel *vpcState;
+
+        QFrame *vpcDetailsFrame;
+        QHBoxLayout *vpcDetailsLayout;
+        QLabel *vpcIDLabel;
+        QLabel *vpcIPv4CIDRLabel;
+        QLabel *vpcStateLabel;
+
+        QFrame *subnetsMainFrame;
+        QPushButton *addSubnetBtn;
+
+        QFrame *routeTableMainFrame;
+        QFrame *igwMainFrame;
+        QFrame *natGatewayMainFrame;
+        QFrame *secGroupMainFrame;
+        QFrame *aclsMainFrame;
 
         // void expandCard();
     private slots:

@@ -9,12 +9,14 @@ SOURCES += \
     awsmanager.cpp \
     main.cpp \
     loginwindow.cpp \
+    subnetcard.cpp \
     vpccard.cpp \
     vpcwindow.cpp
 
 HEADERS += \
     awsmanager.h \
     loginwindow.h \
+    subnetcard.h \
     vpccard.h \
     vpcwindow.h
 

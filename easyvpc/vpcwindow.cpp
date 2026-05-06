@@ -63,6 +63,9 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
     centralLayout->addWidget(myVPCScrollArea, 1);
 
     setCentralWidget(centralWindow);
+
+    //initial api call
+    AWSManager::instance().getVPCsAsync();
 }
 
 void VPCWindow::processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs){
@@ -87,6 +90,14 @@ void VPCWindow::processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs){
         qDebug() << "VPC found: " + name + " " + id + " " + ipv4cidr + " " + state;
 
         myVPCLayout->addWidget(new VPCCard(name, id, ipv4cidr, state, myVPCWindow));
+
+        // vpc caching
+        vpcDetails detail;
+        detail.name = name;
+        detail.id = id;
+        detail.ipv4cidr = ipv4cidr;
+        detail.state = state;
+        vpcCache.insert(id, detail);
     }
     statusBar()->showMessage("Found " + QString::number(vpcs.size()) + " VPCs");
 }

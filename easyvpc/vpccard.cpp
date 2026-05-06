@@ -1,5 +1,4 @@
 #include "vpccard.h"
-
 #include <QFrame>
 #include <QWidget>
 #include <QPushButton>
@@ -29,20 +28,22 @@ VPCCard::VPCCard(const QString &name, const QString &id,
             vpcName->setFont(qfont);
             expandBtn = new QPushButton("Expand", vpcTitleFrame);
             deleteBtn = new QPushButton("Delete", vpcTitleFrame);
+            deleteBtn->setStyleSheet("color: #ff2929");
         vpcTitleLayout->addWidget(vpcName);
         vpcTitleLayout->addStretch();
         vpcTitleLayout->addWidget(expandBtn);
         vpcTitleLayout->addWidget(deleteBtn);
         QFrame *hline = new QFrame(this);
-        hline->setFrameStyle(QFrame::HLine | QFrame::Raised);
-        vpcID = new QLabel("VPC ID: " + id, this);
-        vpcIPv4CIDR = new QLabel("IPv4 CIDR: " + ipv4cidr, this);
-        vpcState = new QLabel("VPC State: " + state, this);
+        vpcDetailsFrame = new QFrame(this);
+        vpcDetailsLayout = new QHBoxLayout(vpcDetailsFrame);
+            hline->setFrameStyle(QFrame::HLine | QFrame::Raised);
+            vpcIDLabel = new QLabel("VPC ID: " + id, this);
+            vpcIPv4CIDRLabel = new QLabel("IPv4 CIDR: " + ipv4cidr, this);
+            vpcStateLabel = new QLabel("VPC State: " + state, this);
+        vpcDetailsLayout->addWidget(vpcIDLabel, 1);
+        vpcDetailsLayout->addWidget(vpcIPv4CIDRLabel, 1);
+        vpcDetailsLayout->addWidget(vpcStateLabel);
     vpcFrameLayout->addWidget(vpcTitleFrame);
     vpcFrameLayout->addWidget(hline);
-    vpcFrameLayout->addWidget(vpcID);
-    vpcFrameLayout->addWidget(vpcIPv4CIDR);
-    vpcFrameLayout->addWidget(vpcState);
-
-    setFixedHeight(150);
+    vpcFrameLayout->addWidget(vpcDetailsFrame);
 }
