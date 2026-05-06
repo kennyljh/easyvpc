@@ -9,6 +9,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QScrollArea>
 #include <aws/core/Aws.h>
 #include <aws/ec2/EC2Client.h>
 
@@ -45,6 +46,9 @@ class VPCCard : public QFrame{
         QHBoxLayout *subnetTopLayout;
         QLabel *subnetLabel;
         QPushButton *addSubnetBtn;
+        QScrollArea *subnetScrollArea;
+        QWidget *subnetsWindow;
+        QVBoxLayout *subnetsLayout;
 
         QFrame *routeTableMainFrame;
         QFrame *igwMainFrame;

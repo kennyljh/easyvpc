@@ -71,7 +71,17 @@ void VPCCard::expandCard(){
         subnetTopLayout->addWidget(subnetLabel);
         subnetTopLayout->addStretch();
         subnetTopLayout->addWidget(addSubnetBtn);
+
+        subnetScrollArea = new QScrollArea(subnetMainFrame);
+            subnetsWindow = new QWidget(subnetScrollArea);
+            subnetsLayout = new QVBoxLayout(subnetsWindow);
+            subnetsLayout->setAlignment(Qt::AlignTop);
+        subnetScrollArea->setWidget(subnetsWindow);
+        subnetScrollArea->setWidgetResizable(true);
+        subnetScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        subnetScrollArea->setFixedHeight(300);
     subnetMainLayout->addWidget(subnetTopFrame);
+    subnetMainLayout->addWidget(subnetScrollArea);
 
     // todo - expand other frames as well
 
@@ -88,7 +98,7 @@ void VPCCard::processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets
 
     for (const Aws::EC2::Model::Subnet &subnet : subnets){
 
-        QString name = "default subnet";
+        QString name = "No subnet name";
         for (const auto &tag : subnet.GetTags()){
             if (tag.GetKey() == "Name") name = QString::fromStdString(tag.GetValue());
         }
@@ -105,7 +115,7 @@ void VPCCard::processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets
                     ", " + ipAddrCount + ", " + zoneID + ", " + zone +
                     ", " + state;
 
-        subnetMainLayout->addWidget(new SubnetCard(name, id, ipv4cidr,
+        subnetsLayout->addWidget(new SubnetCard(name, id, ipv4cidr,
                                                     ipAddrCount, zoneID, zone,
                                                     state, subnetMainFrame));
         // todo - caching subnets

@@ -34,6 +34,7 @@ SubnetCard::SubnetCard(const QString &name, const QString &id,
         subnetMiscLayout = new QHBoxLayout(subnetMiscFrame);
             subnetDetailsFrame = new QFrame(subnetMiscFrame);
             subnetDetailsFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+            subnetDetailsFrame->setLineWidth(2);
             subnetDetailsLayout = new QVBoxLayout(subnetDetailsFrame);
                 subnetDetailsLabel = new QLabel("Details");
                 QFrame *hline = new QFrame(subnetDetailsFrame);
