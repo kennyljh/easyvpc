@@ -133,6 +133,11 @@ void VPCWindow::applyWidgetFade(QWidget *widget){
     fade->setStartValue(0.0);
     fade->setEndValue(1.0);
     fade->start(QAbstractAnimation::DeleteWhenStopped);
+
+    connect(fade, &QPropertyAnimation::finished,
+            [=](){
+                widget->setGraphicsEffect(nullptr);
+            });
 }
 
 void VPCWindow::refreshButtonClicked(){

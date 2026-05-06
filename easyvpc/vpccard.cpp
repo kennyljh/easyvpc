@@ -7,6 +7,8 @@
 #include <QLabel>
 #include <QFont>
 #include <QDebug>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
 #include <awsmanager.h>
 #include <subnetcard.h>
 
@@ -122,6 +124,20 @@ void VPCCard::processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets
                                         ipAddrCount, zoneID, zone,
                                         state, subnetMainFrame);
         subnetsLayout->addWidget(card);
+
+        QGraphicsOpacityEffect *opacityEffect = new QGraphicsOpacityEffect(card);
+        card->setGraphicsEffect(opacityEffect);
+
+        QPropertyAnimation *fade = new QPropertyAnimation(opacityEffect, "opacity");
+        fade->setDuration(400);
+        fade->setStartValue(0.0);
+        fade->setEndValue(1.0);
+        fade->start(QAbstractAnimation::DeleteWhenStopped);
+
+        connect(fade, &QPropertyAnimation::finished,
+                [=](){
+                    card->setGraphicsEffect(nullptr);
+            });
         // todo - caching subnets
     }
 }
