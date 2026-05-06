@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = EasyVPC
 
-QT = core gui
+QT = core gui concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

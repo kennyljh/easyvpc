@@ -8,11 +8,15 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QLabel>
+#include <QStatusBar>
+#include <aws/core/Aws.h>
+#include <aws/ec2/EC2Client.h>
 
 class VPCWindow : public QMainWindow{
     Q_OBJECT
     public:
         explicit VPCWindow(QWidget *parent = 0);
+
     private:
         QWidget *centralWindow;
         QVBoxLayout *centralLayout;
@@ -33,7 +37,18 @@ class VPCWindow : public QMainWindow{
         QWidget *myVPCWindow;
         QVBoxLayout *myVPCLayout;
 
-        void processVPCs();
+        /**
+         * @brief processVPCs - inserts vpcs into appropriate widgets
+         * @param vpcs
+         */
+        void processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs);
+
+        /**
+         * @brief setStatusBar - sets status bar message
+         * @param msg
+         */
+        void setStatusBar(QString msg);
+
     private slots:
         void refreshButtonClicked();
 };

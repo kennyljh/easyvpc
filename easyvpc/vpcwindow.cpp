@@ -5,6 +5,7 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QFont>
+#include <QStatusBar>
 #include <vector>
 #include "vpccard.h"
 #include "awsmanager.h"
@@ -12,6 +13,11 @@
 #include <aws/ec2/EC2Client.h>
 
 VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
+
+    connect(&AWSManager::instance(), &AWSManager::vpcsReady,
+                this, &VPCWindow::processVPCs);
+    connect(&AWSManager::instance(), &AWSManager::apiError,
+                this, &VPCWindow::setStatusBar);
 
     resize(1280, 720);
 
@@ -59,11 +65,7 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
     setCentralWidget(centralWindow);
 }
 
-void VPCWindow::processVPCs(){
-
-    std::vector<Aws::EC2::Model::Vpc> vpcs = AWSManager::instance().getVPCs(
-                                                AWSManager::instance().getSelectedProfile()
-                                            );
+void VPCWindow::processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs){
 
     QLayoutItem *item;
     while ((item = myVPCLayout->takeAt(0)) != nullptr){
@@ -71,7 +73,7 @@ void VPCWindow::processVPCs(){
         delete item;
     }
 
-    for (Aws::EC2::Model::Vpc &vpc : vpcs){
+    for (const Aws::EC2::Model::Vpc &vpc : vpcs){
 
         QString name = "default VPC";
         for (const auto& tag : vpc.GetTags()){
@@ -86,8 +88,15 @@ void VPCWindow::processVPCs(){
 
         myVPCLayout->addWidget(new VPCCard(name, id, ipv4cidr, state, myVPCWindow));
     }
+    statusBar()->showMessage("Found " + QString::number(vpcs.size()) + " VPCs");
+}
+
+void VPCWindow::setStatusBar(QString msg){
+    statusBar()->showMessage(msg);
 }
 
 void VPCWindow::refreshButtonClicked(){
-    processVPCs();
+
+    statusBar()->showMessage("Retrieving list of VPCs...");
+    AWSManager::instance().getVPCsAsync();
 }

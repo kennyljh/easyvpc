@@ -1,47 +1,77 @@
 #include "awsmanager.h"
-#include <vector>
+#include <QObject>
 #include <QString>
 #include <QDebug>
+#include <QtConcurrent>
+#include <vector>
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentialsProviderChain.h>
 #include <aws/ec2/EC2Client.h>
+
+AWSManager::AWSManager(QObject *parent) : QObject(parent) {}
 
 AWSManager &AWSManager::instance(){
     static AWSManager instance;
     return instance;
 }
 
-AWSManager::AWSManager() {}
-
 AWSManager::~AWSManager() {}
 
 void AWSManager::initSDK(){
-
-    Aws::SDKOptions options;
     Aws::InitAPI(options);
 }
 
+void AWSManager::terminateSDK(){
+    Aws::ShutdownAPI(options);
+}
+
 void AWSManager::setSelectedProfile(QString profile){
-    *selectedProfile = profile;
+    selectedProfile = profile;
 }
 
 QString AWSManager::getSelectedProfile(){
-    return *selectedProfile;
+    return selectedProfile;
 }
 
-std::vector<Aws::EC2::Model::Vpc> AWSManager::getVPCs(QString selectedProfile){
+void AWSManager::setSelectedRegion(QString region){
+    selectedRegion = region;
+}
 
-    Aws::Client::ClientConfiguration config;
-    config.region = "us-east-1";
-    config.profileName = selectedProfile.toStdString();
+QString AWSManager::getSelectedRegion(){
+    return selectedRegion;
+}
 
-    Aws::EC2::EC2Client ec2(config);
+void AWSManager::getVPCsAsync(){
 
-    Aws::EC2::Model::DescribeVpcsRequest request;
-    auto outcome = ec2.DescribeVpcs(request);
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
 
-    if (!outcome.IsSuccess()){
-        qDebug() << outcome.GetError().GetMessage();
-    }
-    return outcome.GetResult().GetVpcs();
+    QtConcurrent::run([this, profile, region]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        Aws::EC2::Model::DescribeVpcsRequest request;
+        auto outcome = ec2.DescribeVpcs(request);
+
+        if (!outcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(outcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+        }
+        else {
+
+            auto vpcs = outcome.GetResult().GetVpcs();
+
+            QMetaObject::invokeMethod(this, [this, vpcs]() {
+                emit vpcsReady(vpcs);
+            });
+        }
+    });
 }

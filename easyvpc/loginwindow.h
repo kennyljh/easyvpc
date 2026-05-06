@@ -30,7 +30,17 @@ class LoginWindow : public QMainWindow{
         QComboBox *profilesCBox;
         QPushButton *goBtn;
 
+        /**
+         * @brief getAWSProfiles - retrieve list of found local
+         * profiles
+         * @param profiles
+         */
         void getAWSProfiles(QStringList &profiles);
+
+        /**
+         * @brief loginAWSProfile - login AWS with selected profile
+         * @param selectedProfile
+         */
         void loginAWSProfile(QString selectedProfile);
 
     private slots:
