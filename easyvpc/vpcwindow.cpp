@@ -123,6 +123,13 @@ void VPCWindow::setStatusBar(QString msg){
     statusBar()->showMessage(msg);
 }
 
+void VPCWindow::cacheSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets){
+
+    QString id = QString::fromStdString(subnets.front().GetVpcId());
+    vpcDetails *details = vpcCache.value(id);
+    details->subnets = subnets;
+}
+
 void VPCWindow::refreshButtonClicked(){
 
     statusBar()->showMessage("Retrieving list of VPCs...");

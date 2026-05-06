@@ -8,6 +8,8 @@
 #include <QFont>
 #include <QDebug>
 #include <QLayoutItem>
+#include <aws/core/Aws.h>
+#include <aws/ec2/EC2Client.h>
 #include "awsmanager.h"
 #include "subnetcard.h"
 #include "guiutil.h"
@@ -43,7 +45,6 @@ VPCCard::VPCCard(const QString &name, const QString &id,
             connect(minimizeBtn, &QPushButton::clicked, this, &VPCCard::vpcMinimizeTriggered);
             minimizeBtn->hide();
             deleteBtn = new QPushButton("Delete", vpcTitleFrame);
-            deleteBtn->setStyleSheet("color: #ff1414");
         vpcTitleLayout->addWidget(vpcName);
         vpcTitleLayout->addStretch();
         vpcTitleLayout->addWidget(expandBtn);

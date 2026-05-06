@@ -7,6 +7,9 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QScrollArea>
+#include <aws/core/Aws.h>
+#include <aws/ec2/EC2Client.h>
 
 class SubnetCard : public QFrame{
     Q_OBJECT
@@ -25,6 +28,7 @@ class SubnetCard : public QFrame{
 
         QFrame *subnetMiscFrame;
         QHBoxLayout *subnetMiscLayout;
+
         QFrame *subnetDetailsFrame;
         QVBoxLayout *subnetDetailsLayout;
         QLabel *subnetDetailsLabel;
@@ -35,8 +39,28 @@ class SubnetCard : public QFrame{
         QLabel *subnetStateLabel;
 
         QFrame *subnetEC2sFrame;
-        QFrame *subnetRTsFrame;
+        QVBoxLayout *subnetEC2sLayout;
+        QFrame *ec2sTopFrame;
+        QHBoxLayout *ec2sTopLayout;
+        QLabel *ec2sLabel;
+        QPushButton *ec2sCreateBtn;
+        QScrollArea *ec2sScrollArea;
+        QFrame *ec2sFrame;
+        QVBoxLayout *ec2sLayout;
 
+        QFrame *subnetRTAndACLsFrame;
+        QVBoxLayout *subnetRTAndACLsLayout;
+        QFrame *subnetRTFrame;
+        QVBoxLayout *subnetRTLayout;
+        QLabel *subnetRTLabel;
+        QFrame *subnetACLsFrame;
+        QVBoxLayout *subnetACLsLayout;
+        QLabel *subnetACLsLabel;
+
+    private slots:
+        void processEC2s(const std::vector<Aws::EC2::Model::Reservation> &ec2s);
+
+        //void processRTAndACLs();
 };
 
 #endif // SUBNETCARD_H

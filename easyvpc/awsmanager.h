@@ -69,6 +69,8 @@ class AWSManager : public QObject {
          */
         void getSubnetsAsync(QString vpcID);
 
+        void getEC2sAsync(QString subnetID);
+
     signals:
         /**
          * @brief regionsReady - signals when list of regions retrieved
@@ -87,6 +89,8 @@ class AWSManager : public QObject {
          * @param subnets
          */
         void subnetsReady(const std::vector<Aws::EC2::Model::Subnet> &subnets);
+
+        void ec2sByIdReady(const std::vector<Aws::EC2::Model::Reservation> &ec2s);
 
         /**
          * @brief apiError - signals when there is an api call error

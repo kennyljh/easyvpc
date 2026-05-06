@@ -65,8 +65,13 @@ class VPCCard : public QFrame{
          */
         void expandCard();
 
-        void processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets);
     private slots:
+        /**
+         * @brief processSubnets - adds subnets into appropriate subnet frame
+         * @param subnets
+         */
+        void processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets);
+
         /**
          * @brief expandTriggered - expand current vpc card to include
          * detailed view

@@ -54,6 +54,7 @@ class VPCWindow : public QMainWindow{
         QWidget *myVPCWindow;
         QVBoxLayout *myVPCLayout;
 
+    private slots:
         void processRegions(const std::vector<Aws::EC2::Model::Region> &regions);
 
         /**
@@ -69,7 +70,12 @@ class VPCWindow : public QMainWindow{
          */
         void setStatusBar(QString msg);
 
-    private slots:
+        /**
+         * @brief cacheSubnets - cache subnets to vpc cache
+         * @param subnets
+         */
+        void cacheSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets);
+
         void refreshButtonClicked();
 };
 

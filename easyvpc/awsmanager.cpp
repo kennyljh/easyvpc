@@ -142,3 +142,42 @@ void AWSManager::getSubnetsAsync(QString vpcID){
         }
     });
 }
+
+void AWSManager::getEC2sAsync(QString subnetID){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+    QString id = subnetID;
+
+    QtConcurrent::run([this, profile, region, id]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        Aws::EC2::Model::DescribeInstancesRequest request;
+        request.AddFilters(
+            Aws::EC2::Model::Filter().WithName("subnet-id")
+                                     .AddValues(id.toStdString())
+        );
+        auto outcome = ec2.DescribeInstances(request);
+
+        if (!outcome.IsSuccess()) {
+            QString err = QString::fromStdString(outcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+        }
+        else {
+
+            auto ec2s = outcome.GetResult().GetReservations();
+
+            QMetaObject::invokeMethod(this, [this, ec2s]() {
+                emit ec2sByIdReady(ec2s);
+            });
+        }
+    });
+}
