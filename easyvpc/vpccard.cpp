@@ -6,11 +6,19 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QFont>
+#include <awsmanager.h>
+#include <subnetcard.h>
+#include <QDebug>
 
 VPCCard::VPCCard(const QString &name, const QString &id,
                             const QString &ipv4cidr, const QString &state,
                             QWidget *parent)
         : QFrame (parent) {
+
+    connect(&AWSManager::instance(), &AWSManager::subnetsReady,
+                this, &VPCCard::processSubnets);
+
+    vpcID = id;
 
     setFrameStyle(QFrame::Panel | QFrame::Raised);
     setLineWidth(3);
@@ -27,6 +35,7 @@ VPCCard::VPCCard(const QString &name, const QString &id,
             qfont.setPointSize(15);
             vpcName->setFont(qfont);
             expandBtn = new QPushButton("Expand", vpcTitleFrame);
+            connect(expandBtn, &QPushButton::clicked, this, &VPCCard::vpcExpandTriggered);
             deleteBtn = new QPushButton("Delete", vpcTitleFrame);
             deleteBtn->setStyleSheet("color: #ff2929");
         vpcTitleLayout->addWidget(vpcName);
@@ -46,4 +55,70 @@ VPCCard::VPCCard(const QString &name, const QString &id,
     vpcFrameLayout->addWidget(vpcTitleFrame);
     vpcFrameLayout->addWidget(hline);
     vpcFrameLayout->addWidget(vpcDetailsFrame);
+}
+
+void VPCCard::expandCard(){
+
+    subnetMainFrame = new QFrame(this);
+    subnetMainLayout = new QVBoxLayout(subnetMainFrame);
+        subnetTopFrame = new QFrame(subnetMainFrame);
+        subnetTopLayout = new QHBoxLayout(subnetTopFrame);
+            subnetLabel = new QLabel("Subnets", subnetTopFrame);
+            QFont qfont;
+            qfont.setPointSize(15);
+            subnetLabel->setFont(qfont);
+            addSubnetBtn = new QPushButton("Add", subnetTopFrame);
+        subnetTopLayout->addWidget(subnetLabel);
+        subnetTopLayout->addStretch();
+        subnetTopLayout->addWidget(addSubnetBtn);
+    subnetMainLayout->addWidget(subnetTopFrame);
+
+    // todo - expand other frames as well
+
+    vpcFrameLayout->addWidget(subnetMainFrame);
+}
+
+void VPCCard::processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets){
+
+    // since each instance of VPCCard is connected to the signal, all of them
+    // will be prompted to update subnets frame. This check is necessary
+    // to ensure that the correct subnet frame is updated, otherwise
+    // may encounter nullptr error
+    if (vpcID != subnets.front().GetVpcId()) return;
+
+    for (const Aws::EC2::Model::Subnet &subnet : subnets){
+
+        QString name = "default subnet";
+        for (const auto &tag : subnet.GetTags()){
+            if (tag.GetKey() == "Name") name = QString::fromStdString(tag.GetValue());
+        }
+        QString id = QString::fromStdString(subnet.GetSubnetId());
+        QString ipv4cidr = QString::fromStdString(subnet.GetCidrBlock());
+        QString ipAddrCount = QString::number(subnet.GetAvailableIpAddressCount());
+        QString zoneID = QString::fromStdString(subnet.GetAvailabilityZoneId());
+        QString zone = QString::fromStdString(subnet.GetAvailabilityZone());
+        QString state = QString::fromStdString(
+                            Aws::EC2::Model::SubnetStateMapper
+                            ::GetNameForSubnetState(subnet.GetState())
+        );
+        qDebug() << "Subnet found: " + name + ", " + id + ", " + ipv4cidr +
+                    ", " + ipAddrCount + ", " + zoneID + ", " + zone +
+                    ", " + state;
+
+        subnetMainLayout->addWidget(new SubnetCard(name, id, ipv4cidr,
+                                                    ipAddrCount, zoneID, zone,
+                                                    state, subnetMainFrame));
+        // todo - caching subnets
+    }
+}
+
+void VPCCard::vpcExpandTriggered(){
+
+    // fill up with placeholder frame first
+    expandCard();
+
+    qDebug() << "Finding VPC details with id: " + vpcID;
+    AWSManager::instance().getSubnetsAsync(vpcID);
+
+    //todo - add other async calls
 }

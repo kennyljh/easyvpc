@@ -1,5 +1,4 @@
 #include "vpcwindow.h"
-
 #include <QMainWindow>
 #include <QDockWidget>
 #include <QComboBox>

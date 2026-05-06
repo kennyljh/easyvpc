@@ -9,6 +9,8 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <aws/core/Aws.h>
+#include <aws/ec2/EC2Client.h>
 
 class VPCCard : public QFrame{
     Q_OBJECT
@@ -17,6 +19,11 @@ class VPCCard : public QFrame{
                             const QString &ipv4cidr, const QString &state,
                             QWidget *parent = nullptr);
     private:
+        /**
+         * @brief vpcID - id associated with this vpc card
+         */
+        QString vpcID;
+
         QVBoxLayout *vpcFrameLayout;
 
         QFrame *vpcTitleFrame;
@@ -32,7 +39,11 @@ class VPCCard : public QFrame{
         QLabel *vpcIPv4CIDRLabel;
         QLabel *vpcStateLabel;
 
-        QFrame *subnetsMainFrame;
+        QFrame *subnetMainFrame;
+        QVBoxLayout *subnetMainLayout;
+        QFrame *subnetTopFrame;
+        QHBoxLayout *subnetTopLayout;
+        QLabel *subnetLabel;
         QPushButton *addSubnetBtn;
 
         QFrame *routeTableMainFrame;
@@ -41,9 +52,20 @@ class VPCCard : public QFrame{
         QFrame *secGroupMainFrame;
         QFrame *aclsMainFrame;
 
-        // void expandCard();
+        /**
+         * @brief expandCard - expands vpc card with placeholder frames, recommended
+         * to run first before async requests
+         * @return 0 - if complete
+         */
+        void expandCard();
+
+        void processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets);
     private slots:
-        // void expandTriggered();
+        /**
+         * @brief expandTriggered - expand current vpc card to include
+         * detailed view
+         */
+        void vpcExpandTriggered();
         // void deleteButtonClicked();
 };
 

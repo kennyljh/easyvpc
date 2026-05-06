@@ -126,7 +126,6 @@ void AWSManager::getSubnetsAsync(QString vpcID){
         auto outcome = ec2.DescribeSubnets(request);
 
         if (!outcome.IsSuccess()) {
-
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
