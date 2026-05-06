@@ -54,9 +54,14 @@ class AWSManager : public QObject {
         /**
          * @brief getVPCs - returns vector of VPC objects based on
          * current profile and region setup
-         * @return
          */
         void getVPCsAsync();
+
+        /**
+         * @brief getSubnetsAsync - returns vector of subnets based
+         * on profile, region, and vpc id
+         */
+        void getSubnetsAsync(QString vpcID);
 
     signals:
         /**
@@ -64,6 +69,12 @@ class AWSManager : public QObject {
          * @param vpcs
          */
         void vpcsReady(const std::vector<Aws::EC2::Model::Vpc> &vpcs);
+
+        /**
+         * @brief subnetsReady - signals when list of subnets retrieved
+         * @param subnets
+         */
+        void subnetsReady(const std::vector<Aws::EC2::Model::Subnet> &subnets);
 
         /**
          * @brief apiError - signals when there is an api call error

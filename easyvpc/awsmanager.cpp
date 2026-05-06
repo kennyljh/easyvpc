@@ -75,3 +75,43 @@ void AWSManager::getVPCsAsync(){
         }
     });
 }
+
+void AWSManager::getSubnetsAsync(QString vpcID){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+    QString id = vpcID;
+
+    QtConcurrent::run([this, profile, region, id]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        Aws::EC2::Model::DescribeSubnetsRequest request;
+        request.AddFilters(
+            Aws::EC2::Model::Filter().WithName("vpc-id")
+                                     .AddValues(id.toStdString())
+        );
+        auto outcome = ec2.DescribeSubnets(request);
+
+        if (!outcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(outcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+        }
+        else {
+
+            auto subnets = outcome.GetResult().GetSubnets();
+
+            QMetaObject::invokeMethod(this, [this, subnets]() {
+                emit subnetsReady(subnets);
+            });
+        }
+    });
+}
