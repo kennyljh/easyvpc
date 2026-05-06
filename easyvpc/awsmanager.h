@@ -52,6 +52,12 @@ class AWSManager : public QObject {
         QString getSelectedRegion();
 
         /**
+         * @brief getRegionsAsync - returns vector of available
+         * regions
+         */
+        void getRegionsAsync();
+
+        /**
          * @brief getVPCs - returns vector of VPC objects based on
          * current profile and region setup
          */
@@ -64,6 +70,12 @@ class AWSManager : public QObject {
         void getSubnetsAsync(QString vpcID);
 
     signals:
+        /**
+         * @brief regionsReady - signals when list of regions retrieved
+         * @param regions
+         */
+        void regionsReady(const std::vector<Aws::EC2::Model::Region> &regions);
+
         /**
          * @brief vpcsReady - signals when list of vpcs retrieved
          * @param vpcs

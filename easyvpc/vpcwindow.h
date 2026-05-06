@@ -54,6 +54,8 @@ class VPCWindow : public QMainWindow{
         QWidget *myVPCWindow;
         QVBoxLayout *myVPCLayout;
 
+        void processRegions(const std::vector<Aws::EC2::Model::Region> &regions);
+
         /**
          * @brief processVPCs - inserts vpcs into appropriate widgets, cache
          * vpcs based on id

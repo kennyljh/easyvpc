@@ -18,6 +18,8 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
                 this, &VPCWindow::processVPCs);
     connect(&AWSManager::instance(), &AWSManager::apiError,
                 this, &VPCWindow::setStatusBar);
+    connect(&AWSManager::instance(), &AWSManager::regionsReady,
+                this, &VPCWindow::processRegions);
 
     resize(1280, 720);
 
@@ -29,6 +31,7 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
         topBarLayout = new QHBoxLayout(topBarFrame);
             backToHubBtn = new QPushButton("EasyVPC", topBarFrame);
             regionsCBox = new QComboBox(topBarFrame);
+            regionsCBox->addItem("us-east-1");
         topBarLayout->addWidget(backToHubBtn);
         topBarLayout->addStretch();
         topBarLayout->addWidget(regionsCBox);
@@ -66,6 +69,17 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
 
     //initial api call
     AWSManager::instance().getVPCsAsync();
+    AWSManager::instance().getRegionsAsync();
+}
+
+void VPCWindow::processRegions(const std::vector<Aws::EC2::Model::Region> &regions){
+
+    regionsCBox->clear();
+    for (const Aws::EC2::Model::Region &region : regions){
+        regionsCBox->addItem(QString::fromStdString(region.GetRegionName()));
+        qDebug() << "Found region " + region.GetRegionName();
+    }
+    regionsCBox->setCurrentText("us-east-1");
 }
 
 void VPCWindow::processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs){

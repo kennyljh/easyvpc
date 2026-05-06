@@ -41,6 +41,34 @@ QString AWSManager::getSelectedRegion(){
     return selectedRegion;
 }
 
+void AWSManager::getRegionsAsync(){
+
+    QtConcurrent::run([this]() {
+
+        Aws::EC2::EC2Client ec2;
+
+        Aws::EC2::Model::DescribeRegionsRequest request;
+        auto outcome = ec2.DescribeRegions(request);
+
+        if (!outcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(outcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+        }
+        else {
+
+            auto regions = outcome.GetResult().GetRegions();
+
+            QMetaObject::invokeMethod(this, [this, regions]() {
+                emit regionsReady(regions);
+            });
+        }
+    });
+}
+
 void AWSManager::getVPCsAsync(){
 
     QString profile = selectedProfile;
