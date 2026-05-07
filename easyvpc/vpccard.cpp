@@ -130,15 +130,9 @@ void VPCCard::expandCard(){
         RTScrollArea->setAlignment(Qt::AlignTop);
     RTMainLayout->addWidget(RTTopFrame);
     RTMainLayout->addWidget(RTScrollArea);
-<<<<<<< HEAD
 
     util.applyWidgetFade(RTMainFrame, 300);
 
-    // todo - expand other frames as well
-
-    vpcFrameLayout->addWidget(subnetMainFrame);
-    vpcFrameLayout->addWidget(RTMainFrame);
-=======
     RTMainLayout->setSpacing(0);
 
     util.applyWidgetFade(RTMainFrame, 300);
@@ -168,7 +162,6 @@ void VPCCard::expandCard(){
     vpcFrameLayout->addWidget(subnetMainFrame);
     vpcFrameLayout->addWidget(RTMainFrame);
     vpcFrameLayout->addWidget(IGWMainFrame);
->>>>>>> 0c6adca (added async calls for retrieving RTs based on vpc id. added RT insertion into appropriate frames)
 }
 
 void VPCCard::processSubnets(const QString &vpcId, const std::vector<Aws::EC2::Model::Subnet> &subnets){
@@ -283,8 +276,6 @@ void VPCCard::processRTs(const QString &vpcId, const std::vector<Aws::EC2::Model
     }
 }
 
-<<<<<<< HEAD
-=======
 void VPCCard::processIGW(const QString &vpcId, const std::vector<Aws::EC2::Model::InternetGateway> &IGW){
 
     GUIUtil util;
@@ -347,7 +338,6 @@ void VPCCard::processIGW(const QString &vpcId, const std::vector<Aws::EC2::Model
     IGWDetailsLayout->addWidget(idAndOwnerIdFrame);
 }
 
->>>>>>> 0c6adca (added async calls for retrieving RTs based on vpc id. added RT insertion into appropriate frames)
 void VPCCard::vpcExpandTriggered(){
 
     expandBtn->hide();
@@ -359,12 +349,7 @@ void VPCCard::vpcExpandTriggered(){
     qDebug() << "Finding VPC details with id: " + vpcID;
     AWSManager::instance().getSubnetsAsync(vpcID);
     AWSManager::instance().getRTsByVPCIdAsync(vpcID);
-<<<<<<< HEAD
-=======
     AWSManager::instance().getIGWByVPCIdAsync(vpcID);
->>>>>>> 0c6adca (added async calls for retrieving RTs based on vpc id. added RT insertion into appropriate frames)
-
-    //todo - add other async calls
 }
 
 void VPCCard::vpcMinimizeTriggered(){
