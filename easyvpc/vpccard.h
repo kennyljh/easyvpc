@@ -52,7 +52,16 @@ class VPCCard : public QFrame{
         QWidget *subnetsWindow;
         QVBoxLayout *subnetsLayout;
 
-        QFrame *routeTableMainFrame;
+        QFrame *RTMainFrame;
+        QVBoxLayout *RTMainLayout;
+        QFrame *RTTopFrame;
+        QHBoxLayout *RTTopLayout;
+        QLabel *RTLabel;
+        QPushButton *addRTBtn;
+        QScrollArea *RTScrollArea;
+        QWidget *RTsWindow;
+        QVBoxLayout *RTsLayout;
+
         QFrame *igwMainFrame;
         QFrame *natGatewayMainFrame;
         QFrame *secGroupMainFrame;
@@ -71,6 +80,8 @@ class VPCCard : public QFrame{
          * @param subnets
          */
         void processSubnets(const QString &vpcId, const std::vector<Aws::EC2::Model::Subnet> &subnets);
+
+        void processRTs(const QString &vpcId, const std::vector<Aws::EC2::Model::RouteTable> &RTs);
 
         /**
          * @brief expandTriggered - expand current vpc card to include

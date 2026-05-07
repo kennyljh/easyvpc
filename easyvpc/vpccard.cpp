@@ -13,6 +13,7 @@
 #include "awsmanager.h"
 #include "subnetcard.h"
 #include "guiutil.h"
+#include "rtcard.h"
 
 VPCCard::VPCCard(const QString &name, const QString &id,
                             const QString &ipv4cidr, const QString &state,
@@ -21,6 +22,8 @@ VPCCard::VPCCard(const QString &name, const QString &id,
 
     connect(&AWSManager::instance(), &AWSManager::subnetsReady,
                 this, &VPCCard::processSubnets);
+    connect(&AWSManager::instance(), &AWSManager::RTsByVPCIdReady,
+                this, &VPCCard::processRTs);
 
     vpcID = id;
 
@@ -99,13 +102,42 @@ void VPCCard::expandCard(){
 
     util.applyWidgetFade(subnetMainFrame, 300);
 
+    RTMainFrame = new QFrame(this);
+    RTMainLayout = new QVBoxLayout(RTMainFrame);
+    RTMainLayout->setAlignment(Qt::AlignTop);
+        RTTopFrame = new QFrame(RTMainFrame);
+        RTTopFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        RTTopLayout = new QHBoxLayout(RTTopFrame);
+            RTLabel = new QLabel("Route Tables", RTTopFrame);
+            RTLabel->setFont(qfontB15);
+            addRTBtn = new QPushButton("Add", RTTopFrame);
+        RTTopLayout->addWidget(RTLabel);
+        RTTopLayout->addStretch();
+        RTTopLayout->addWidget(addRTBtn);
+
+        RTScrollArea = new QScrollArea(RTMainFrame);
+            RTsWindow = new QWidget(RTScrollArea);
+            RTsLayout = new QVBoxLayout(RTsWindow);
+            RTsLayout->setAlignment(Qt::AlignTop);
+        RTScrollArea->setWidget(RTsWindow);
+        RTScrollArea->setWidgetResizable(true);
+        RTScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+        RTScrollArea->setFixedHeight(300);
+        RTScrollArea->setAlignment(Qt::AlignTop);
+    RTMainLayout->addWidget(RTTopFrame);
+    RTMainLayout->addWidget(RTScrollArea);
+
+    util.applyWidgetFade(RTMainFrame, 300);
+
     // todo - expand other frames as well
 
     vpcFrameLayout->addWidget(subnetMainFrame);
+    vpcFrameLayout->addWidget(RTMainFrame);
 }
 
 void VPCCard::processSubnets(const QString &vpcId, const std::vector<Aws::EC2::Model::Subnet> &subnets){
 
+    GUIUtil util;
     QFont qfont11;
     qfont11.setPointSize(11);
 
@@ -132,7 +164,7 @@ void VPCCard::processSubnets(const QString &vpcId, const std::vector<Aws::EC2::M
 
     for (const Aws::EC2::Model::Subnet &subnet : subnets){
 
-        QString name = "No subnet name";
+        QString name = "default-subnet-name";
         for (const auto &tag : subnet.GetTags()){
             if (tag.GetKey() == "Name") name = QString::fromStdString(tag.GetValue());
         }
@@ -153,9 +185,65 @@ void VPCCard::processSubnets(const QString &vpcId, const std::vector<Aws::EC2::M
                                             ipAddrCount, zoneID, zone,
                                             state, subnetsWindow);
         subnetsLayout->addWidget(card);
-        GUIUtil util;
         util.applyWidgetFade(card, 300);
         // todo - caching subnets
+    }
+}
+
+void VPCCard::processRTs(const QString &vpcId, const std::vector<Aws::EC2::Model::RouteTable> &RTs){
+
+    GUIUtil util;
+    QFont qfont11;
+    qfont11.setPointSize(11);
+
+    if (vpcID != vpcId) return;
+
+    if (RTs.empty()){
+
+        QLabel *label = new QLabel("No route tables found", RTMainFrame);
+        label->setFont(qfont11);
+        RTsLayout->addWidget(label);
+        RTsLayout->setAlignment(Qt::AlignCenter);
+        return;
+    }
+
+    QLayoutItem *item;
+    while ((item = RTsLayout->takeAt(0)) != nullptr){
+        if (QWidget *widget = item->widget()) widget->deleteLater();
+        delete item;
+    }
+
+    for (const auto &rt : RTs){
+
+        QString name = "default-RT-name";
+        for (const auto &tag : rt.GetTags()){
+            if (tag.GetKey() == "Name") name = QString::fromStdString(tag.GetValue());
+        }
+        QString id = QString::fromStdString(rt.GetRouteTableId());
+        QString ownerId = QString::fromStdString(rt.GetOwnerId());
+        qDebug() << "Found route table: " + name + " " + id + " " + ownerId;
+
+        QStringList subnetsIds;
+        QString gatewayId;
+
+        for (const auto &assoc : rt.GetAssociations()){
+            if (!assoc.GetMain()){
+                subnetsIds.append(QString::fromStdString(assoc.GetSubnetId()));
+                qDebug() << "Found subnet: " + QString::fromStdString(assoc.GetSubnetId());
+            }
+        }
+        for (const auto &route : rt.GetRoutes()){
+            if (route.GetGatewayId().length() > 0){
+                gatewayId = QString::fromStdString(route.GetGatewayId());
+                qDebug() << "Found gateway: " + QString::fromStdString(route.GetGatewayId());
+            }
+            else gatewayId = "N/A";
+        }
+
+        RTCard *card = new RTCard(vpcId, name, id, ownerId, subnetsIds,
+                                    gatewayId, RTsWindow);
+        RTsLayout->addWidget(card);
+        util.applyWidgetFade(card, 300);
     }
 }
 
@@ -169,6 +257,7 @@ void VPCCard::vpcExpandTriggered(){
 
     qDebug() << "Finding VPC details with id: " + vpcID;
     AWSManager::instance().getSubnetsAsync(vpcID);
+    AWSManager::instance().getRTsByVPCIdAsync(vpcID);
 
     //todo - add other async calls
 }

@@ -89,6 +89,8 @@ class AWSManager : public QObject {
          */
         void getACLsAsync(QString subnetID);
 
+        void getRTsByVPCIdAsync(QString vpcID);
+
     signals:
         /**
          * @brief regionsReady - signals when list of regions retrieved
@@ -128,6 +130,8 @@ class AWSManager : public QObject {
          * @param ACLs
          */
         void ACLsByIdReady(const QString &subnetId, const std::vector<Aws::EC2::Model::NetworkAcl> &ACLs);
+
+        void RTsByVPCIdReady(const QString &vpcId, const std::vector<Aws::EC2::Model::RouteTable> &RTs);
 
         /**
          * @brief apiError - signals when there is an api call error

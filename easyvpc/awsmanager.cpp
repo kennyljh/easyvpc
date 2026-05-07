@@ -264,3 +264,44 @@ void AWSManager::getACLsAsync(QString subnetID){
         }
     });
 }
+
+void AWSManager::getRTsByVPCIdAsync(QString vpcID){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+    QString id = vpcID;
+
+    QtConcurrent::run([this, profile, region, id]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        Aws::EC2::Model::DescribeRouteTablesRequest request;
+        request.AddFilters(
+            Aws::EC2::Model::Filter().WithName("vpc-id")
+                                     .AddValues(id.toStdString())
+        );
+        auto outcome = ec2.DescribeRouteTables(request);
+
+        if (!outcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(outcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+        }
+        else {
+
+            auto RTs = outcome.GetResult().GetRouteTables();
+
+            QMetaObject::invokeMethod(this, [this, id, RTs]() {
+                emit RTsByVPCIdReady(id, RTs);
+                emit notifyStatus("Found " + QString::number(RTs.size()) + " route tables");
+            });
+        }
+    });
+}

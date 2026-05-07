@@ -12,7 +12,8 @@
 #include <aws/ec2/EC2Client.h>
 
 RTCard::RTCard(const QString &vpcid, const QString &name, const QString &rtid,
-                            const QString &ownerId, QWidget *parent)
+                    const QString &ownerId, const QStringList &subnetIds,
+                    const QString &gatewayId, QWidget *parent)
         : QFrame (parent) {
 
     vpcID = vpcid;
@@ -69,6 +70,15 @@ RTCard::RTCard(const QString &vpcid, const QString &name, const QString &rtid,
                 subnetsScrollArea->setWidget(subnetsFrame);
                 subnetsScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
                 subnetsScrollArea->setWidgetResizable(true);
+                for (const auto &subnetId : subnetIds){
+                    QFrame *subnetFrame = new QFrame(subnetsFrame);
+                    subnetFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+                    subnetFrame->setLineWidth(1);
+                    QVBoxLayout *subnetLayout = new QVBoxLayout(subnetFrame);
+                    QLabel *subnetLabel = new QLabel(subnetId);
+                    subnetLayout->addWidget(subnetLabel);
+                    subnetsLayout->addWidget(subnetFrame);
+                }
             RTSubnetsLayout->addWidget(subnetsTopFrame);
             RTSubnetsLayout->addWidget(subnetsScrollArea);
 
@@ -85,6 +95,13 @@ RTCard::RTCard(const QString &vpcid, const QString &name, const QString &rtid,
                 routesScrollArea = new QScrollArea(RTRoutesFrame);
                     routesFrame = new QFrame(RTRoutesFrame);
                     routesLayout = new QVBoxLayout(routesFrame);
+                    QFrame *gatewayFrame = new QFrame(routesFrame);
+                    gatewayFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+                    gatewayFrame->setLineWidth(1);
+                    QVBoxLayout *gatewayLayout = new QVBoxLayout(gatewayFrame);
+                    QLabel *gatewayLabel = new QLabel(gatewayId);
+                    gatewayLayout->addWidget(gatewayLabel);
+                    routesLayout->addWidget(gatewayFrame);
                 routesScrollArea->setWidget(routesFrame);
                 routesScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
                 routesScrollArea->setWidgetResizable(true);
@@ -95,5 +112,4 @@ RTCard::RTCard(const QString &vpcid, const QString &name, const QString &rtid,
         RTMiscLayout->addWidget(RTRoutesFrame, 1);
     mainLayout->addWidget(RTTopFrame);
     mainLayout->addWidget(RTMiscFrame);
-
 }

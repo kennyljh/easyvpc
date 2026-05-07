@@ -8,6 +8,8 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QScrollArea>
+#include <QString>
+#include <QStringList>
 #include <aws/core/Aws.h>
 #include <aws/ec2/EC2Client.h>
 
@@ -15,7 +17,8 @@ class RTCard : public QFrame{
     Q_OBJECT
     public:
         explicit RTCard(const QString &vpcid, const QString &name, const QString &rtid,
-                            const QString &ownerId, QWidget *parent = nullptr);
+                            const QString &ownerId, const QStringList &subnetIds,
+                            const QString &gatewayId, QWidget *parent = nullptr);
 
     private:
         QString vpcID;
