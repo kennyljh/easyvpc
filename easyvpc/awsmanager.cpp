@@ -136,8 +136,8 @@ void AWSManager::getSubnetsAsync(QString vpcID){
 
             auto subnets = outcome.GetResult().GetSubnets();
 
-            QMetaObject::invokeMethod(this, [this, subnets]() {
-                emit subnetsReady(subnets);
+            QMetaObject::invokeMethod(this, [this, id, subnets]() {
+                emit subnetsReady(id, subnets);
                 emit notifyStatus("Found " + QString::number(subnets.size()) + " subnets");
             });
         }

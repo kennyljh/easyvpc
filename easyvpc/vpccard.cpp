@@ -101,15 +101,26 @@ void VPCCard::expandCard(){
     vpcFrameLayout->addWidget(subnetMainFrame);
 }
 
-void VPCCard::processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets){
+void VPCCard::processSubnets(const QString &vpcId, const std::vector<Aws::EC2::Model::Subnet> &subnets){
 
-    if (subnets.empty()) return;
+    QFont qfont11;
+    qfont11.setPointSize(11);
+
+    if (subnets.empty()){
+        if (vpcID == vpcId){
+            QLabel *label = new QLabel("No subnets found", subnetMainFrame);
+            label->setFont(qfont11);
+            subnetsLayout->addWidget(label);
+            subnetsLayout->setAlignment(Qt::AlignCenter);
+        }
+        return;
+    }
 
     // since each instance of VPCCard is connected to the signal, all of them
     // will be prompted to update subnets frame. This check is necessary
     // to ensure that the correct subnet frame is updated, otherwise
     // may encounter nullptr error
-    if (vpcID != subnets.front().GetVpcId()) return;
+    if (vpcID != vpcId || vpcID != subnets.front().GetVpcId()) return;
 
     QLayoutItem *item;
     while ((item = subnetsLayout->takeAt(0)) != nullptr){
@@ -138,7 +149,7 @@ void VPCCard::processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets
 
         SubnetCard *card = new SubnetCard(vpcID, name, id, ipv4cidr,
                                             ipAddrCount, zoneID, zone,
-                                            state, subnetMainFrame);
+                                            state, subnetsWindow);
         subnetsLayout->addWidget(card);
         GUIUtil util;
         util.applyWidgetFade(card, 300);

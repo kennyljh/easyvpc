@@ -90,10 +90,10 @@ class AWSManager : public QObject {
         void vpcsReady(const std::vector<Aws::EC2::Model::Vpc> &vpcs);
 
         /**
-         * @brief subnetsReady - signals when list of subnets retrieved
+         * @brief subnetsReady - signals when list of subnets retrieved for vpc id
          * @param subnets
          */
-        void subnetsReady(const std::vector<Aws::EC2::Model::Subnet> &subnets);
+        void subnetsReady(const QString &vpcId, const std::vector<Aws::EC2::Model::Subnet> &subnets);
 
         void reservationsByIdReady(const std::vector<Aws::EC2::Model::Reservation> &ec2s);
 
@@ -103,7 +103,7 @@ class AWSManager : public QObject {
          */
         void apiError(const QString &err);
 
-        void notifyStatus(const QString status);
+        void notifyStatus(const QString &status);
 
     private:
         explicit AWSManager(QObject *parent = nullptr);

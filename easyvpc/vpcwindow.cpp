@@ -20,6 +20,8 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
                 this, &VPCWindow::setStatusBar);
     connect(&AWSManager::instance(), &AWSManager::regionsReady,
                 this, &VPCWindow::processRegions);
+    connect(&AWSManager::instance(), &AWSManager::notifyStatus,
+                this, &VPCWindow::setStatusBar);
 
     resize(1280, 720);
 
