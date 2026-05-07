@@ -24,6 +24,8 @@ VPCCard::VPCCard(const QString &name, const QString &id,
                 this, &VPCCard::processSubnets);
     connect(&AWSManager::instance(), &AWSManager::RTsByVPCIdReady,
                 this, &VPCCard::processRTs);
+    connect(&AWSManager::instance(), &AWSManager::IGWByVPCIdReady,
+                this, &VPCCard::processIGW);
 
     vpcID = id;
 
@@ -66,6 +68,7 @@ VPCCard::VPCCard(const QString &name, const QString &id,
     vpcFrameLayout->addWidget(vpcTitleFrame);
     vpcFrameLayout->addWidget(titleHLine );
     vpcFrameLayout->addWidget(vpcDetailsFrame);
+    vpcFrameLayout->setSpacing(0);
 }
 
 void VPCCard::expandCard(){
@@ -99,6 +102,7 @@ void VPCCard::expandCard(){
         subnetScrollArea->setAlignment(Qt::AlignTop);
     subnetMainLayout->addWidget(subnetTopFrame);
     subnetMainLayout->addWidget(subnetScrollArea);
+    subnetMainLayout->setSpacing(0);
 
     util.applyWidgetFade(subnetMainFrame, 300);
 
@@ -126,6 +130,7 @@ void VPCCard::expandCard(){
         RTScrollArea->setAlignment(Qt::AlignTop);
     RTMainLayout->addWidget(RTTopFrame);
     RTMainLayout->addWidget(RTScrollArea);
+<<<<<<< HEAD
 
     util.applyWidgetFade(RTMainFrame, 300);
 
@@ -133,6 +138,37 @@ void VPCCard::expandCard(){
 
     vpcFrameLayout->addWidget(subnetMainFrame);
     vpcFrameLayout->addWidget(RTMainFrame);
+=======
+    RTMainLayout->setSpacing(0);
+
+    util.applyWidgetFade(RTMainFrame, 300);
+
+    IGWMainFrame = new QFrame(this);
+    IGWMainLayout = new QVBoxLayout(IGWMainFrame);
+    IGWMainLayout->setAlignment(Qt::AlignTop);
+        IGWTopFrame = new QFrame(IGWMainFrame);
+        IGWTopFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        IGWTopLayout = new QHBoxLayout(IGWTopFrame);
+            IGWLabel = new QLabel("Internet Gateway", IGWTopFrame);
+            IGWLabel->setFont(qfontB15);
+            IGWAddBtn = new QPushButton("Add", IGWTopFrame);
+        IGWTopLayout->addWidget(IGWLabel);
+        IGWTopLayout->addStretch();
+        IGWTopLayout->addWidget(IGWAddBtn);
+
+        IGWDetailsFrame = new QFrame(IGWMainFrame);
+        IGWDetailsFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+        IGWDetailsFrame->setLineWidth(3);
+        IGWDetailsLayout = new QVBoxLayout(IGWDetailsFrame);
+    IGWMainLayout->addWidget(IGWTopFrame);
+    IGWMainLayout->addWidget(IGWDetailsFrame);
+
+    util.applyWidgetFade(IGWMainFrame, 300);
+
+    vpcFrameLayout->addWidget(subnetMainFrame);
+    vpcFrameLayout->addWidget(RTMainFrame);
+    vpcFrameLayout->addWidget(IGWMainFrame);
+>>>>>>> 0c6adca (added async calls for retrieving RTs based on vpc id. added RT insertion into appropriate frames)
 }
 
 void VPCCard::processSubnets(const QString &vpcId, const std::vector<Aws::EC2::Model::Subnet> &subnets){
@@ -247,6 +283,71 @@ void VPCCard::processRTs(const QString &vpcId, const std::vector<Aws::EC2::Model
     }
 }
 
+<<<<<<< HEAD
+=======
+void VPCCard::processIGW(const QString &vpcId, const std::vector<Aws::EC2::Model::InternetGateway> &IGW){
+
+    GUIUtil util;
+    QFont qfont11;
+    qfont11.setPointSize(11);
+    QFont qfontB13;
+    qfontB13.setBold(true);
+    qfontB13.setPointSize(13);
+
+    if (vpcID != vpcId) return;
+
+    if (IGW.empty()){
+
+        QLabel *label = new QLabel("No IGW found", IGWDetailsFrame);
+        label->setFont(qfont11);
+        IGWDetailsLayout->addWidget(label);
+        IGWDetailsLayout->setAlignment(Qt::AlignCenter);
+        IGWAddBtn->show();
+        return;
+    }
+    else {
+        IGWAddBtn->hide();
+    }
+
+    QLayoutItem *item;
+    while ((item = IGWDetailsLayout->takeAt(0)) != nullptr){
+        if (QWidget *widget = item->widget()) widget->deleteLater();
+        delete item;
+    }
+
+    const auto &igw = IGW.front();
+
+    QString name = "default-IGW-name";
+    for (const auto &tag : igw.GetTags()){
+        if (tag.GetKey() == "Name") name = QString::fromStdString(tag.GetValue());
+    }
+    QString IGWId = QString::fromStdString(igw.GetInternetGatewayId());
+    QString ownerId = QString::fromStdString(igw.GetOwnerId());
+    qDebug() << "Found IGW: " + name + " " + IGWId + " " + ownerId;
+
+    nameAndBtnFrame = new QFrame(IGWDetailsFrame);
+    nameAndBtnLayout = new QHBoxLayout(nameAndBtnFrame);
+        IGWNameLabel = new QLabel(name);
+        IGWNameLabel->setFont(qfontB13);
+        deleteIGWBtn = new QPushButton("Delete", nameAndBtnFrame);
+    nameAndBtnLayout->addWidget(IGWNameLabel);
+    nameAndBtnLayout->addStretch();
+    nameAndBtnLayout->addWidget(deleteIGWBtn);
+
+    idAndOwnerIdFrame = new QFrame(IGWDetailsFrame);
+    idAndOwnerIdFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+    idAndOwnerIdFrame->setLineWidth(2);
+    idAndOwnerIdLayout = new QHBoxLayout(idAndOwnerIdFrame);
+        IGWIdLabel = new QLabel("IGW ID: " + IGWId, idAndOwnerIdFrame);
+        IGWOwnerIdLabel = new QLabel("Owner ID: " + ownerId, idAndOwnerIdFrame);
+    idAndOwnerIdLayout->addWidget(IGWIdLabel);
+    idAndOwnerIdLayout->addWidget(IGWOwnerIdLabel);
+
+    IGWDetailsLayout->addWidget(nameAndBtnFrame);
+    IGWDetailsLayout->addWidget(idAndOwnerIdFrame);
+}
+
+>>>>>>> 0c6adca (added async calls for retrieving RTs based on vpc id. added RT insertion into appropriate frames)
 void VPCCard::vpcExpandTriggered(){
 
     expandBtn->hide();
@@ -258,6 +359,10 @@ void VPCCard::vpcExpandTriggered(){
     qDebug() << "Finding VPC details with id: " + vpcID;
     AWSManager::instance().getSubnetsAsync(vpcID);
     AWSManager::instance().getRTsByVPCIdAsync(vpcID);
+<<<<<<< HEAD
+=======
+    AWSManager::instance().getIGWByVPCIdAsync(vpcID);
+>>>>>>> 0c6adca (added async calls for retrieving RTs based on vpc id. added RT insertion into appropriate frames)
 
     //todo - add other async calls
 }

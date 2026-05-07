@@ -6,8 +6,6 @@
 #include <QVBoxLayout>
 #include <QFont>
 #include <QDebug>
-#include "awsmanager.h"
-#include "guiutil.h"
 #include <aws/core/Aws.h>
 #include <aws/ec2/EC2Client.h>
 
@@ -53,6 +51,7 @@ RTCard::RTCard(const QString &vpcid, const QString &name, const QString &rtid,
             RTDetailsLayout->addWidget(hline);
             RTDetailsLayout->addWidget(RTIDLabel);
             RTDetailsLayout->addWidget(RTOwnerIDLabel);
+            RTDetailsLayout->setAlignment(Qt::AlignTop);
 
             RTSubnetsFrame = new QFrame(RTMiscFrame);
             RTSubnetsFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
@@ -70,6 +69,8 @@ RTCard::RTCard(const QString &vpcid, const QString &name, const QString &rtid,
                 subnetsScrollArea->setWidget(subnetsFrame);
                 subnetsScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
                 subnetsScrollArea->setWidgetResizable(true);
+
+                if (subnetIds.empty()) subnetsLayout->addWidget(new QLabel("No subnets"));
                 for (const auto &subnetId : subnetIds){
                     QFrame *subnetFrame = new QFrame(subnetsFrame);
                     subnetFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
@@ -112,4 +113,5 @@ RTCard::RTCard(const QString &vpcid, const QString &name, const QString &rtid,
         RTMiscLayout->addWidget(RTRoutesFrame, 1);
     mainLayout->addWidget(RTTopFrame);
     mainLayout->addWidget(RTMiscFrame);
+    mainLayout->setSpacing(0);
 }

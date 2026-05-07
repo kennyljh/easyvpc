@@ -62,10 +62,23 @@ class VPCCard : public QFrame{
         QWidget *RTsWindow;
         QVBoxLayout *RTsLayout;
 
-        QFrame *igwMainFrame;
-        QFrame *natGatewayMainFrame;
-        QFrame *secGroupMainFrame;
-        QFrame *aclsMainFrame;
+        QFrame *IGWMainFrame;
+        QVBoxLayout *IGWMainLayout;
+        QFrame *IGWTopFrame;
+        QHBoxLayout *IGWTopLayout;
+        QLabel *IGWLabel;
+        QPushButton *IGWAddBtn;
+
+        QFrame *IGWDetailsFrame;
+        QVBoxLayout *IGWDetailsLayout;
+        QFrame *nameAndBtnFrame;
+        QHBoxLayout *nameAndBtnLayout;
+        QLabel *IGWNameLabel;
+        QPushButton *deleteIGWBtn;
+        QFrame *idAndOwnerIdFrame;
+        QHBoxLayout *idAndOwnerIdLayout;
+        QLabel *IGWIdLabel;
+        QLabel *IGWOwnerIdLabel;
 
         /**
          * @brief expandCard - expands vpc card with placeholder frames, recommended
@@ -81,7 +94,19 @@ class VPCCard : public QFrame{
          */
         void processSubnets(const QString &vpcId, const std::vector<Aws::EC2::Model::Subnet> &subnets);
 
+        /**
+         * @brief processRTs - adds route tables into appropriate rt frame for given vpc id
+         * @param vpcId
+         * @param RTs
+         */
         void processRTs(const QString &vpcId, const std::vector<Aws::EC2::Model::RouteTable> &RTs);
+
+        /**
+         * @brief processIGW - adds internet gateway into appropriate igw frame for given vpc id
+         * @param vpcId
+         * @param IGW
+         */
+        void processIGW(const QString &vpcId, const std::vector<Aws::EC2::Model::InternetGateway> &IGW);
 
         /**
          * @brief expandTriggered - expand current vpc card to include

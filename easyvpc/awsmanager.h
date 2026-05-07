@@ -89,7 +89,19 @@ class AWSManager : public QObject {
          */
         void getACLsAsync(QString subnetID);
 
+        /**
+         * @brief getRTsByVPCIdAsync - makes async call to get RTs for
+         * current profile, region, and vpc id
+         * @param vpcID
+         */
         void getRTsByVPCIdAsync(QString vpcID);
+
+        /**
+         * @brief getIGWByVPCIdAsync - makes async call to get IGW for
+         * current profile, region, and vpc id
+         * @param vpcID
+         */
+        void getIGWByVPCIdAsync(QString vpcID);
 
     signals:
         /**
@@ -131,7 +143,19 @@ class AWSManager : public QObject {
          */
         void ACLsByIdReady(const QString &subnetId, const std::vector<Aws::EC2::Model::NetworkAcl> &ACLs);
 
+        /**
+         * @brief RTsByVPCIdReady - signals when RT retrieved for vpc id
+         * @param vpcId
+         * @param RTs
+         */
         void RTsByVPCIdReady(const QString &vpcId, const std::vector<Aws::EC2::Model::RouteTable> &RTs);
+
+        /**
+         * @brief IGWByVPCIdReady - signals when IGW retrieved for vpc id
+         * @param vpcId
+         * @param IGW
+         */
+        void IGWByVPCIdReady(const QString &vpcId, const std::vector<Aws::EC2::Model::InternetGateway> &IGW);
 
         /**
          * @brief apiError - signals when there is an api call error

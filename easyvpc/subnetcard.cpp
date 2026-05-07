@@ -90,6 +90,7 @@ SubnetCard::SubnetCard(const QString &vpcid, const QString &name, const QString 
                 ec2sScrollArea->setWidgetResizable(true);
             subnetEC2sLayout->addWidget(ec2sTopFrame);
             subnetEC2sLayout->addWidget(ec2sScrollArea);
+            subnetEC2sLayout->setSpacing(0);
 
             subnetRTAndACLsFrame = new QFrame(subnetMiscFrame);
             subnetRTAndACLsFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
@@ -119,6 +120,7 @@ SubnetCard::SubnetCard(const QString &vpcid, const QString &name, const QString 
         subnetMiscLayout->addWidget(subnetRTAndACLsFrame, 1);
     mainLayout->addWidget(subnetTopFrame);
     mainLayout->addWidget(subnetMiscFrame);
+    mainLayout->setSpacing(0);
 
     // api calls
     AWSManager::instance().getReservationsAsync(subnetID);
