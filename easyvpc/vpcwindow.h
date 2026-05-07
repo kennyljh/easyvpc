@@ -12,6 +12,7 @@
 #include <QMap>
 #include <aws/core/Aws.h>
 #include <aws/ec2/EC2Client.h>
+#include "vpccreationdialog.h"
 
 class VPCWindow : public QMainWindow{
     Q_OBJECT
@@ -47,8 +48,8 @@ class VPCWindow : public QMainWindow{
         QHBoxLayout *myVPCBarLayout;
         QLabel *welcomeName;
         QPushButton *refreshBtn;
-        QPushButton *sortBtn;
         QPushButton *expandAllBtn;
+        QPushButton *createBtn;
 
         QScrollArea *myVPCScrollArea;
         QWidget *myVPCWindow;
@@ -77,6 +78,16 @@ class VPCWindow : public QMainWindow{
         void cacheSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets);
 
         void refreshButtonClicked();
+
+        void createVPCButtonClicked();
+
+        void VPCCreationDataDebug(
+            QString &vpcName,
+            QString &vpcCIDR,
+            const QList<VPCCreationDialog::subnetInfo> &subnetInfos,
+            QString &igwName,
+            const QList<VPCCreationDialog::RTInfo> &RTInfos
+        );
 };
 
 #endif // VPCWINDOW_H

@@ -11,17 +11,25 @@
 #include <QComboBox>
 #include <QListWidget>
 #include <QAbstractItemView>
+#include <QFont>
+#include <QList>
 
 VPCCreationDialog::VPCCreationDialog(QWidget *parent)
                   : QDialog(parent){
 
-    setWindowTitle("Create  VPC");
+    setWindowTitle("Create VPC");
     resize(650, 680);
+
+    QFont qfontB11;
+    qfontB11.setPointSize(11);
+    qfontB11.setBold(true);
 
     mainLayout = new QVBoxLayout(this);
         createVPCScrollArea = new QScrollArea(this);
+        createVPCScrollArea->setWidgetResizable(true);
         createVPCFrame = new QFrame(createVPCScrollArea);
         createVPCLayout = new QVBoxLayout(createVPCFrame);
+        createVPCLayout->setSpacing(10);
             vpcNameLabel = new QLabel("VPC Name", createVPCFrame);
             vpcNameEdt = new QLineEdit(createVPCFrame);
             vpcNameEdt->setPlaceholderText("my-vpc-01");
@@ -32,37 +40,53 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
         createVPCLayout->addWidget(vpcNameEdt);
         createVPCLayout->addWidget(vpcIPv4CIDRLabel);
         createVPCLayout->addWidget(vpcIPv4CIDREdt);
+        createVPCLayout->addSpacing(15);
 
             subnetsLabel = new QLabel("Subnets", createVPCFrame);
             subnetsFrame = new QFrame(createVPCFrame);
+            subnetsFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+            subnetsFrame->setLineWidth(1);
             subnetsLayout = new QVBoxLayout(subnetsFrame);
                 subnetNameLabel = new QLabel("Subnet Name", subnetsFrame);
                 subnetNameEdt = new QLineEdit(subnetsFrame);
                 subnetNameEdt->setPlaceholderText("my-subnet-01");
+                AZsLabel = new QLabel("Availability Zones", subnetsFrame);
                 regionsCBox = new QComboBox(subnetsFrame);
                 // todo - retrieve from api call
                 regionsCBox->addItems({"us-east-1a", "us-east-1b"});
                 subnetIPv4CIDRLabel = new QLabel("Subnet IPv4 CIDR", subnetsFrame);
                 subnetIPv4CIDREdt = new QLineEdit(subnetsFrame);
                 subnetIPv4CIDREdt->setPlaceholderText("10.0.1.0/24");
+
+                subnetBundle *subnet = new subnetBundle();
+                subnet->name = subnetNameEdt;
+                subnet->zone = regionsCBox;
+                subnet->ipv4 = subnetIPv4CIDREdt;
+                subnetBundles.push_back(*subnet);
+
                 addSubnetBtn = new QPushButton("Add", subnetsFrame);
             subnetsLayout->addWidget(subnetNameLabel);
             subnetsLayout->addWidget(subnetNameEdt);
+            subnetsLayout->addWidget(AZsLabel);
             subnetsLayout->addWidget(regionsCBox);
             subnetsLayout->addWidget(subnetIPv4CIDRLabel);
             subnetsLayout->addWidget(subnetIPv4CIDREdt);
             subnetsLayout->addWidget(addSubnetBtn);
         createVPCLayout->addWidget(subnetsLabel);
         createVPCLayout->addWidget(subnetsFrame);
+        createVPCLayout->addSpacing(15);
 
             igwLabel = new QLabel("IGW Name", createVPCFrame);
             igwEdt = new QLineEdit(createVPCFrame);
             igwEdt->setPlaceholderText("my-igw-01");
         createVPCLayout->addWidget(igwLabel);
         createVPCLayout->addWidget(igwEdt);
+        createVPCLayout->addSpacing(15);
 
             RTsLabel = new QLabel("Route Tables", createVPCFrame);
             RTsFrame = new QFrame(createVPCFrame);
+            RTsFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+            RTsFrame->setLineWidth(1);
             RTsLayout = new QVBoxLayout(RTsFrame);
                 RTNameLabel = new QLabel("Route Table Name", RTsFrame);
                 RTNameEdt = new QLineEdit(RTsFrame);
@@ -70,7 +94,14 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
                 subnetsLWidget = new QListWidget(RTsFrame);
                 // todo - retrieve from existing subnets
                 subnetsLWidget->addItems({"subnet-1", "subnet-2"});
+                subnetsLWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
                 subnetsLWidget->setSelectionMode(QAbstractItemView::MultiSelection);
+
+                RTBundle *RT = new RTBundle();
+                RT->name = RTNameEdt;
+                RT->subnets = subnetsLWidget;
+                RTBundles.push_back(*RT);
+
                 addRTBtn = new QPushButton("Add", RTsFrame);
             RTsLayout->addWidget(RTNameLabel);
             RTsLayout->addWidget(RTNameEdt);
@@ -78,9 +109,57 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
             RTsLayout->addWidget(addRTBtn);
         createVPCLayout->addWidget(RTsLabel);
         createVPCLayout->addWidget(RTsFrame);
+        createVPCLayout->addSpacing(25);
+
+            createBtn = new QPushButton("Create VPC", createVPCFrame);
+            connect(createBtn, &QPushButton::clicked,
+                        this, &VPCCreationDialog::createVPCRequest);
+        createVPCLayout->addWidget(createBtn);
         createVPCScrollArea->setWidget(createVPCFrame);
+    mainLayout->addWidget(createVPCScrollArea);
 }
 
+void VPCCreationDialog::createVPCRequest(){
+
+    QString vpcName = vpcNameEdt->text();
+    QString vpcCIDR = vpcIPv4CIDREdt->text();
+
+    for (const auto &subnetBundle : subnetBundles){
+
+        subnetInfo *info = new subnetInfo;
+        info->name = subnetBundle.name->text();
+        info->zone = subnetBundle.zone->currentText();
+        info->ipv4 = subnetBundle.ipv4->text();
+        subnetInfos.append(*info);
+        qDebug() << "Found subnet bundle: " + info->name + " " + info->zone + " " + info->ipv4;
+    }
+
+    QString igwName = igwEdt->text();
+
+    for (const auto &RTBundle : RTBundles){
+
+        RTInfo *info = new RTInfo;
+        info->name = RTBundle.name->text();
+        qDebug() << "Found RT: " + info->name;
+        QList<QListWidgetItem*> selected = RTBundle.subnets->selectedItems();
+        QStringList list;
+        for (const auto &item : selected){
+            list.append(item->text());
+            qDebug() << "Found subnet: " + item->text() + " for " + info->name;
+        }
+        info->subnets = list;
+        RTInfos.append(*info);
+    }
+
+    emit VPCCreationRequested(
+        vpcName,
+        vpcCIDR,
+        subnetInfos,
+        igwName,
+        RTInfos
+    );
+    accept();
+}
 
 
 

@@ -11,13 +11,44 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QListWidget>
+#include <vector>
+#include <QList>
+#include <QStringList>
 
 class VPCCreationDialog : public QDialog{
     Q_OBJECT
     public:
         explicit VPCCreationDialog(QWidget *parent = 0);
 
+        struct subnetInfo{
+            QString name;
+            QString zone;
+            QString ipv4;
+        };
+
+        struct RTInfo{
+            QString name;
+            QStringList subnets;
+        };
+
     private:
+        struct subnetBundle{
+            QLineEdit *name;
+            QComboBox *zone;
+            QLineEdit *ipv4;
+        };
+
+        struct RTBundle{
+            QLineEdit *name;
+            QListWidget *subnets;
+        };
+
+        std::vector<subnetBundle> subnetBundles;
+        std::vector<RTBundle> RTBundles;
+
+        QList<subnetInfo> subnetInfos;
+        QList<RTInfo> RTInfos;
+
         QVBoxLayout *mainLayout;
         QScrollArea *createVPCScrollArea;
         QFrame *createVPCFrame;
@@ -33,6 +64,7 @@ class VPCCreationDialog : public QDialog{
         QVBoxLayout *subnetsLayout;
         QLabel *subnetNameLabel;
         QLineEdit *subnetNameEdt;
+        QLabel *AZsLabel;
         QComboBox *regionsCBox;
         QLabel *subnetIPv4CIDRLabel;
         QLineEdit *subnetIPv4CIDREdt;
@@ -50,10 +82,17 @@ class VPCCreationDialog : public QDialog{
         QPushButton *addRTBtn;
 
         QPushButton *createBtn;
-        QPushButton *cancelBtn;
-    signals:
-        // todo - signal for sending all related info
 
+        void createVPCRequest();
+
+    signals:
+        void VPCCreationRequested(
+            QString &vpcName,
+            QString &vpcCIDR,
+            const QList<VPCCreationDialog::subnetInfo> &subnetInfos,
+            QString &igwName,
+            const QList<VPCCreationDialog::RTInfo> &RTInfos
+        );
 };
 
 #endif // VPCCREATIONDIALOG_H

@@ -6,9 +6,13 @@
 #include <QFont>
 #include <QStatusBar>
 #include <vector>
+#include <QDialog>
+#include <QList>
 #include "vpccard.h"
 #include "awsmanager.h"
 #include "guiutil.h"
+#include "vpccreationdialog.h"
+#include "vpccreationdialog.h"
 #include <aws/core/Aws.h>
 #include <aws/ec2/EC2Client.h>
 
@@ -47,13 +51,15 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
             welcomeName->setFont(qfont);
             refreshBtn = new QPushButton("Refresh", myVPCBarFrame);
             connect(refreshBtn, &QPushButton::clicked, this, &VPCWindow::refreshButtonClicked);
-            sortBtn = new QPushButton("Sort", myVPCBarFrame);
             expandAllBtn = new QPushButton("Expand All", myVPCBarFrame);
+            createBtn = new QPushButton("Create", myVPCBarFrame);
+            connect(createBtn, &QPushButton::clicked,
+                        this, &VPCWindow::createVPCButtonClicked);
         myVPCBarLayout->addWidget(welcomeName);
         myVPCBarLayout->addStretch();
         myVPCBarLayout->addWidget(refreshBtn);
-        myVPCBarLayout->addWidget(sortBtn);
         myVPCBarLayout->addWidget(expandAllBtn);
+        myVPCBarLayout->addWidget(createBtn);
 
         myVPCScrollArea = new QScrollArea(centralWindow);
             myVPCWindow = new QWidget(myVPCScrollArea);
@@ -136,4 +142,39 @@ void VPCWindow::refreshButtonClicked(){
 
     statusBar()->showMessage("Retrieving list of VPCs...");
     AWSManager::instance().getVPCsAsync();
+}
+
+void VPCWindow::createVPCButtonClicked(){
+
+    VPCCreationDialog *dialog = new VPCCreationDialog(this);
+
+    connect(dialog, &VPCCreationDialog::VPCCreationRequested,
+                this, &VPCWindow::VPCCreationDataDebug);
+
+    dialog->exec();
+}
+
+void VPCWindow::VPCCreationDataDebug(
+            QString &vpcName,
+            QString &vpcCIDR,
+            const QList<VPCCreationDialog::subnetInfo> &subnetInfos,
+            QString &igwName,
+            const QList<VPCCreationDialog::RTInfo> &RTInfos){
+
+    qDebug() << "VPC Name:" << vpcName;
+    qDebug() << "VPC CIDR:" << vpcCIDR;
+    qDebug() << "IGW Name:" << igwName;
+
+    qDebug() << "Subnets:";
+    for (const auto &subnet : subnetInfos) {
+        qDebug() << "  Name:" << subnet.name
+                 << "Zone:" << subnet.zone
+                 << "IPv4:" << subnet.ipv4;
+    }
+
+    qDebug() << "Route Tables:";
+    for (const auto &rt : RTInfos) {
+        qDebug() << "  RT Name:" << rt.name
+                 << "Subnets:" << rt.subnets.join(", ");
+    }
 }
