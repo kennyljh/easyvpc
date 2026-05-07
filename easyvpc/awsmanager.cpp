@@ -138,12 +138,13 @@ void AWSManager::getSubnetsAsync(QString vpcID){
 
             QMetaObject::invokeMethod(this, [this, subnets]() {
                 emit subnetsReady(subnets);
+                emit notifyStatus("Found " + QString::number(subnets.size()) + " subnets");
             });
         }
     });
 }
 
-void AWSManager::getEC2sAsync(QString subnetID){
+void AWSManager::getReservationsAsync(QString subnetID){
 
     QString profile = selectedProfile;
     QString region = selectedRegion;
@@ -176,7 +177,7 @@ void AWSManager::getEC2sAsync(QString subnetID){
             auto ec2s = outcome.GetResult().GetReservations();
 
             QMetaObject::invokeMethod(this, [this, ec2s]() {
-                emit ec2sByIdReady(ec2s);
+                emit reservationsByIdReady(ec2s);
             });
         }
     });

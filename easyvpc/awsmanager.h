@@ -69,7 +69,12 @@ class AWSManager : public QObject {
          */
         void getSubnetsAsync(QString vpcID);
 
-        void getEC2sAsync(QString subnetID);
+        /**
+         * @brief getEC2sAsync - returns reservations based on
+         * profile, region, and subnet id
+         * @param subnetID
+         */
+        void getReservationsAsync(QString subnetID);
 
     signals:
         /**
@@ -90,13 +95,15 @@ class AWSManager : public QObject {
          */
         void subnetsReady(const std::vector<Aws::EC2::Model::Subnet> &subnets);
 
-        void ec2sByIdReady(const std::vector<Aws::EC2::Model::Reservation> &ec2s);
+        void reservationsByIdReady(const std::vector<Aws::EC2::Model::Reservation> &ec2s);
 
         /**
          * @brief apiError - signals when there is an api call error
          * @param err
          */
         void apiError(const QString &err);
+
+        void notifyStatus(const QString status);
 
     private:
         explicit AWSManager(QObject *parent = nullptr);

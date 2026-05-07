@@ -16,6 +16,7 @@ void GUIUtil::applyWidgetFade(QWidget *widget, int duration){
     fade->setDuration(duration);
     fade->setStartValue(0.0);
     fade->setEndValue(1.0);
+    fade->setEasingCurve(QEasingCurve::InOutQuad);
     fade->start(QAbstractAnimation::DeleteWhenStopped);
 
     QAbstractAnimation::connect(fade, &QPropertyAnimation::finished,

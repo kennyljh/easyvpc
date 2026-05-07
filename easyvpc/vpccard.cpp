@@ -68,15 +68,16 @@ VPCCard::VPCCard(const QString &name, const QString &id,
 void VPCCard::expandCard(){
 
     GUIUtil util;
+    QFont qfontB15;
+    qfontB15.setPointSize(15);
+    qfontB15.setBold(true);
 
     subnetMainFrame = new QFrame(this);
     subnetMainLayout = new QVBoxLayout(subnetMainFrame);
         subnetTopFrame = new QFrame(subnetMainFrame);
         subnetTopLayout = new QHBoxLayout(subnetTopFrame);
             subnetLabel = new QLabel("Subnets", subnetTopFrame);
-            QFont qfont;
-            qfont.setPointSize(15);
-            subnetLabel->setFont(qfont);
+            subnetLabel->setFont(qfontB15);
             addSubnetBtn = new QPushButton("Add", subnetTopFrame);
         subnetTopLayout->addWidget(subnetLabel);
         subnetTopLayout->addStretch();
@@ -135,9 +136,9 @@ void VPCCard::processSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets
                     ", " + ipAddrCount + ", " + zoneID + ", " + zone +
                     ", " + state;
 
-        SubnetCard *card = new SubnetCard(name, id, ipv4cidr,
-                                        ipAddrCount, zoneID, zone,
-                                        state, subnetMainFrame);
+        SubnetCard *card = new SubnetCard(vpcID, name, id, ipv4cidr,
+                                            ipAddrCount, zoneID, zone,
+                                            state, subnetMainFrame);
         subnetsLayout->addWidget(card);
         GUIUtil util;
         util.applyWidgetFade(card, 300);

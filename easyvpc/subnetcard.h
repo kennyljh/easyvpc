@@ -14,11 +14,14 @@
 class SubnetCard : public QFrame{
     Q_OBJECT
     public:
-        explicit SubnetCard(const QString &name, const QString &id,
+        explicit SubnetCard(const QString &vpcid, const QString &name, const QString &subnetid,
                                 const QString &ipv4cidr, const QString &ipAddrCount,
                                 const QString &zoneID, const QString &zone,
                                 const QString &state, QWidget *parent = nullptr);
     private:
+        QString vpcID;
+        QString subnetID;
+
         QVBoxLayout *mainLayout;
 
         QFrame *subnetTopFrame;
@@ -43,7 +46,7 @@ class SubnetCard : public QFrame{
         QFrame *ec2sTopFrame;
         QHBoxLayout *ec2sTopLayout;
         QLabel *ec2sLabel;
-        QPushButton *ec2sCreateBtn;
+        QPushButton *ec2sManageBtn;
         QScrollArea *ec2sScrollArea;
         QFrame *ec2sFrame;
         QVBoxLayout *ec2sLayout;
