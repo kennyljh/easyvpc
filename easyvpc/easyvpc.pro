@@ -13,6 +13,7 @@ SOURCES += \
     rtcard.cpp \
     subnetcard.cpp \
     vpccard.cpp \
+    vpccreationdialog.cpp \
     vpcwindow.cpp
 
 HEADERS += \
@@ -22,6 +23,7 @@ HEADERS += \
     rtcard.h \
     subnetcard.h \
     vpccard.h \
+    vpccreationdialog.h \
     vpcwindow.h
 
 RESOURCES += \
