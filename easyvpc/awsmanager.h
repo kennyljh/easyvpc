@@ -52,29 +52,42 @@ class AWSManager : public QObject {
         QString getSelectedRegion();
 
         /**
-         * @brief getRegionsAsync - returns vector of available
-         * regions
+         * @brief getRegionsAsync - makes async call to get regions
          */
         void getRegionsAsync();
 
         /**
-         * @brief getVPCs - returns vector of VPC objects based on
-         * current profile and region setup
+         * @brief getVPCs - makes async call to get vpcs for current
+         * profile and region
          */
         void getVPCsAsync();
 
         /**
-         * @brief getSubnetsAsync - returns vector of subnets based
-         * on profile, region, and vpc id
+         * @brief getSubnetsAsync - makes async call to get subnets for
+         * current profile, region, and vpc id
          */
         void getSubnetsAsync(QString vpcID);
 
         /**
-         * @brief getEC2sAsync - returns reservations based on
-         * profile, region, and subnet id
+         * @brief getEC2sAsync - makes async call to get reservations for
+         * current profile, region, and subnet id
          * @param subnetID
          */
         void getReservationsAsync(QString subnetID);
+
+        /**
+         * @brief getRTAsync - makes async call to get RTs for current
+         * profile, region, and subnet id
+         * @param subnetID
+         */
+        void getRTAsync(QString subnetID);
+
+        /**
+         * @brief getACLsAsync - makes async call to get ACLs for
+         * current profile, region, and subnet id
+         * @param subnetID
+         */
+        void getACLsAsync(QString subnetID);
 
     signals:
         /**
@@ -95,7 +108,26 @@ class AWSManager : public QObject {
          */
         void subnetsReady(const QString &vpcId, const std::vector<Aws::EC2::Model::Subnet> &subnets);
 
-        void reservationsByIdReady(const std::vector<Aws::EC2::Model::Reservation> &ec2s);
+        /**
+         * @brief reservationsByIdReady - signals when reservations retrieved for subnet id
+         * @param subnetId
+         * @param reservations
+         */
+        void reservationsByIdReady(const QString &subnetId, const std::vector<Aws::EC2::Model::Reservation> &reservations);
+
+        /**
+         * @brief RTByIdReady - signals when RT retrieved for subnet id
+         * @param subnetId
+         * @param RT
+         */
+        void RTByIdReady(const QString &subnetId, const std::vector<Aws::EC2::Model::RouteTable> &RT);
+
+        /**
+         * @brief ACLsByIdReady - signals when ACLs retrieved for subnet id
+         * @param subnetId
+         * @param ACLs
+         */
+        void ACLsByIdReady(const QString &subnetId, const std::vector<Aws::EC2::Model::NetworkAcl> &ACLs);
 
         /**
          * @brief apiError - signals when there is an api call error
@@ -103,6 +135,10 @@ class AWSManager : public QObject {
          */
         void apiError(const QString &err);
 
+        /**
+         * @brief notifyStatus - signals to notify status change
+         * @param status
+         */
         void notifyStatus(const QString &status);
 
     private:

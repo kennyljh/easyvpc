@@ -74,7 +74,9 @@ void VPCCard::expandCard(){
 
     subnetMainFrame = new QFrame(this);
     subnetMainLayout = new QVBoxLayout(subnetMainFrame);
+    subnetMainLayout->setAlignment(Qt::AlignTop);
         subnetTopFrame = new QFrame(subnetMainFrame);
+        subnetTopFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         subnetTopLayout = new QHBoxLayout(subnetTopFrame);
             subnetLabel = new QLabel("Subnets", subnetTopFrame);
             subnetLabel->setFont(qfontB15);
@@ -91,6 +93,7 @@ void VPCCard::expandCard(){
         subnetScrollArea->setWidgetResizable(true);
         subnetScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         subnetScrollArea->setFixedHeight(300);
+        subnetScrollArea->setAlignment(Qt::AlignTop);
     subnetMainLayout->addWidget(subnetTopFrame);
     subnetMainLayout->addWidget(subnetScrollArea);
 
@@ -106,21 +109,20 @@ void VPCCard::processSubnets(const QString &vpcId, const std::vector<Aws::EC2::M
     QFont qfont11;
     qfont11.setPointSize(11);
 
-    if (subnets.empty()){
-        if (vpcID == vpcId){
-            QLabel *label = new QLabel("No subnets found", subnetMainFrame);
-            label->setFont(qfont11);
-            subnetsLayout->addWidget(label);
-            subnetsLayout->setAlignment(Qt::AlignCenter);
-        }
-        return;
-    }
-
     // since each instance of VPCCard is connected to the signal, all of them
     // will be prompted to update subnets frame. This check is necessary
     // to ensure that the correct subnet frame is updated, otherwise
     // may encounter nullptr error
-    if (vpcID != vpcId || vpcID != subnets.front().GetVpcId()) return;
+    if (vpcID != vpcId) return;
+
+    if (subnets.empty()){
+
+        QLabel *label = new QLabel("No subnets found", subnetMainFrame);
+        label->setFont(qfont11);
+        subnetsLayout->addWidget(label);
+        subnetsLayout->setAlignment(Qt::AlignCenter);
+        return;
+    }
 
     QLayoutItem *item;
     while ((item = subnetsLayout->takeAt(0)) != nullptr){

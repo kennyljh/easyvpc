@@ -126,6 +126,7 @@ void AWSManager::getSubnetsAsync(QString vpcID){
         auto outcome = ec2.DescribeSubnets(request);
 
         if (!outcome.IsSuccess()) {
+
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
@@ -166,6 +167,7 @@ void AWSManager::getReservationsAsync(QString subnetID){
         auto outcome = ec2.DescribeInstances(request);
 
         if (!outcome.IsSuccess()) {
+
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
@@ -174,10 +176,90 @@ void AWSManager::getReservationsAsync(QString subnetID){
         }
         else {
 
-            auto ec2s = outcome.GetResult().GetReservations();
+            auto reservations = outcome.GetResult().GetReservations();
 
-            QMetaObject::invokeMethod(this, [this, ec2s]() {
-                emit reservationsByIdReady(ec2s);
+            QMetaObject::invokeMethod(this, [this, id, reservations]() {
+                emit reservationsByIdReady(id, reservations);
+            });
+        }
+    });
+}
+
+void AWSManager::getRTAsync(QString subnetID){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+    QString id = subnetID;
+
+    QtConcurrent::run([this, profile, region, id]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        Aws::EC2::Model::DescribeRouteTablesRequest request;
+        request.AddFilters(
+            Aws::EC2::Model::Filter().WithName("association.subnet-id")
+                                     .AddValues(id.toStdString())
+        );
+        auto outcome = ec2.DescribeRouteTables(request);
+
+        if (!outcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(outcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+        }
+        else {
+
+            auto RT = outcome.GetResult().GetRouteTables();
+
+            QMetaObject::invokeMethod(this, [this, id, RT]() {
+                emit RTByIdReady(id, RT);
+            });
+        }
+    });
+}
+
+void AWSManager::getACLsAsync(QString subnetID){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+    QString id = subnetID;
+
+    QtConcurrent::run([this, profile, region, id]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        Aws::EC2::Model::DescribeNetworkAclsRequest request;
+        request.AddFilters(
+            Aws::EC2::Model::Filter().WithName("association.subnet-id")
+                                     .AddValues(id.toStdString())
+        );
+        auto outcome = ec2.DescribeNetworkAcls(request);
+
+        if (!outcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(outcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+        }
+        else {
+
+            auto ACLs = outcome.GetResult().GetNetworkAcls();
+
+            QMetaObject::invokeMethod(this, [this, id, ACLs]() {
+                emit ACLsByIdReady(id, ACLs);
             });
         }
     });

@@ -19,6 +19,10 @@ SubnetCard::SubnetCard(const QString &vpcid, const QString &name, const QString 
 
     connect(&AWSManager::instance(), &AWSManager::reservationsByIdReady,
                 this, &SubnetCard::processEC2s);
+    connect(&AWSManager::instance(), &AWSManager::RTByIdReady,
+                this, &SubnetCard::processRT);
+    connect(&AWSManager::instance(), &AWSManager::ACLsByIdReady,
+                this, &SubnetCard::processACLs);
 
     vpcID = vpcid;
     subnetID = subnetid;
@@ -104,7 +108,7 @@ SubnetCard::SubnetCard(const QString &vpcid, const QString &name, const QString 
                 subnetACLsFrame->setLineWidth(1);
                 subnetACLsLayout = new QVBoxLayout(subnetACLsFrame);
                 subnetACLsLayout->setAlignment(Qt::AlignTop);
-                    subnetACLsLabel = new QLabel("ACLs");
+                    subnetACLsLabel = new QLabel("Network ACLs");
                     subnetACLsLabel->setFont(qfontB13);
                 subnetACLsLayout->addWidget(subnetACLsLabel);
             subnetRTAndACLsLayout->addWidget(subnetRTFrame, 1);
@@ -118,16 +122,26 @@ SubnetCard::SubnetCard(const QString &vpcid, const QString &name, const QString 
 
     // api calls
     AWSManager::instance().getReservationsAsync(subnetID);
+    AWSManager::instance().getRTAsync(subnetID);
+    AWSManager::instance().getACLsAsync(subnetID);
 }
 
-void SubnetCard::processEC2s(const std::vector<Aws::EC2::Model::Reservation> &reservations){
+void SubnetCard::processEC2s(const QString &subnetId, const std::vector<Aws::EC2::Model::Reservation> &reservations){
 
     GUIUtil util;
     QFont qfontB11;
     qfontB11.setBold(true);
     qfontB11.setPointSize(11);
 
+    if (subnetID != subnetId) return;
+
     if (reservations.empty()) return;
+
+    QLayoutItem *item;
+    while ((item = ec2sLayout->takeAt(0)) != nullptr){
+        if (QWidget *widget = item->widget()) widget->deleteLater();
+        delete item;
+    }
 
     for (const auto &reservation : reservations){
         for (const auto &instance : reservation.GetInstances()){
@@ -137,7 +151,7 @@ void SubnetCard::processEC2s(const std::vector<Aws::EC2::Model::Reservation> &re
             ec2Frame->setLineWidth(1);
             QVBoxLayout *ec2Layout = new QVBoxLayout(ec2Frame);
 
-            QString name = "no ec2 name";
+            QString name = "default-EC2-name";
             for (const auto &tag : instance.GetTags()){
                 if (tag.GetKey() == "Name") name = QString::fromStdString(tag.GetValue());
             }
@@ -162,5 +176,72 @@ void SubnetCard::processEC2s(const std::vector<Aws::EC2::Model::Reservation> &re
             ec2sLayout->addWidget(ec2Frame);
             util.applyWidgetFade(ec2Frame, 300);
         }
+    }
+}
+
+void SubnetCard::processRT(const QString &subnetId, const std::vector<Aws::EC2::Model::RouteTable> &RT){
+
+    GUIUtil util;
+    QFont qfontB10;
+    qfontB10.setBold(true);
+    qfontB10.setPointSize(10);
+
+    if (subnetID != subnetId) return;
+
+    if (RT.empty()) return;
+
+    for (const auto &rt : RT){
+
+        QFrame *RTFrame = new QFrame(subnetRTFrame);
+        RTFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+        RTFrame->setLineWidth(1);
+        QVBoxLayout *RTLayout = new QVBoxLayout(RTFrame);
+
+        QString name = "default-RT-name";
+        for (const auto &tag : rt.GetTags()){
+            if (tag.GetKey() == "Name") name = QString::fromStdString(tag.GetValue());
+        }
+        QString RTId = QString::fromStdString(rt.GetRouteTableId());
+
+        qDebug() << "Found RT: " + name + " " + RTId;
+
+        QLabel *RTLabel = new QLabel(name + " / " + RTId);
+        RTLabel->setFont(qfontB10);
+        RTLayout->addWidget(RTLabel);
+        subnetRTLayout->addWidget(RTFrame);
+        util.applyWidgetFade(RTFrame, 300);
+    }
+}
+
+void SubnetCard::processACLs(const QString &subnetId, const std::vector<Aws::EC2::Model::NetworkAcl> &ACLs){
+
+    GUIUtil util;
+    QFont qfontB10;
+    qfontB10.setBold(true);
+    qfontB10.setPointSize(10);
+
+    if (subnetID != subnetId) return;
+
+    if (ACLs.empty()) return;
+
+    for (const auto &acl : ACLs){
+
+        QFrame *ACLFrame = new QFrame(subnetACLsFrame);
+        ACLFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
+        ACLFrame->setLineWidth(1);
+        QVBoxLayout *ACLLayout = new QVBoxLayout(ACLFrame);
+
+        QString name = "default-ACL-name";
+        for (const auto &tag : acl.GetTags()){
+            if (tag.GetKey() == "Name") name = QString::fromStdString(tag.GetValue());
+        }
+        QString ACLId = QString::fromStdString(acl.GetNetworkAclId());
+
+        qDebug() << "Found Network ACL: " + name + " " + ACLId;
+
+        QLabel *ACLLabel = new QLabel(name + " / " + ACLId);
+        ACLLabel->setFont(qfontB10);
+        ACLLayout->addWidget(ACLLabel);
+        subnetACLsLayout->addWidget(ACLFrame);
     }
 }
