@@ -10,6 +10,7 @@ SOURCES += \
     guiutil.cpp \
     main.cpp \
     loginwindow.cpp \
+    rtcard.cpp \
     subnetcard.cpp \
     vpccard.cpp \
     vpcwindow.cpp
@@ -18,6 +19,7 @@ HEADERS += \
     awsmanager.h \
     guiutil.h \
     loginwindow.h \
+    rtcard.h \
     subnetcard.h \
     vpccard.h \
     vpcwindow.h
