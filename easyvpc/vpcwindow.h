@@ -81,6 +81,15 @@ class VPCWindow : public QMainWindow{
 
         void createVPCButtonClicked();
 
+        /**
+         * @brief VPCCreationDataDebug - to debug vpc creation request
+         * information retrieved from dialog
+         * @param vpcName
+         * @param vpcCIDR
+         * @param subnetInfos
+         * @param igwName
+         * @param RTInfos
+         */
         void VPCCreationDataDebug(
             QString &vpcName,
             QString &vpcCIDR,

@@ -78,12 +78,18 @@ class VPCCreationDialog : public QDialog{
         QVBoxLayout *RTsLayout;
         QLabel *RTNameLabel;
         QLineEdit *RTNameEdt;
+        QPushButton *refreshSubnetsBtn;
         QListWidget *subnetsLWidget;
         QPushButton *addRTBtn;
 
         QPushButton *createBtn;
 
         void createVPCRequest();
+
+    private slots:
+        void subnetsRefreshButtonClicked();
+
+        // todo - slots for adding new subnets and rts
 
     signals:
         void VPCCreationRequested(

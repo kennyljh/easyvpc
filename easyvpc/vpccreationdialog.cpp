@@ -91,9 +91,10 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
                 RTNameLabel = new QLabel("Route Table Name", RTsFrame);
                 RTNameEdt = new QLineEdit(RTsFrame);
                 RTNameEdt->setPlaceholderText("my-rt-01");
+                refreshSubnetsBtn = new QPushButton("Refresh Subnets");
+                connect(refreshSubnetsBtn, &QPushButton::clicked,
+                            this, &VPCCreationDialog::subnetsRefreshButtonClicked);
                 subnetsLWidget = new QListWidget(RTsFrame);
-                // todo - retrieve from existing subnets
-                subnetsLWidget->addItems({"subnet-1", "subnet-2"});
                 subnetsLWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
                 subnetsLWidget->setSelectionMode(QAbstractItemView::MultiSelection);
 
@@ -105,6 +106,7 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
                 addRTBtn = new QPushButton("Add", RTsFrame);
             RTsLayout->addWidget(RTNameLabel);
             RTsLayout->addWidget(RTNameEdt);
+            RTsLayout->addWidget(refreshSubnetsBtn);
             RTsLayout->addWidget(subnetsLWidget);
             RTsLayout->addWidget(addRTBtn);
         createVPCLayout->addWidget(RTsLabel);
@@ -117,6 +119,14 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
         createVPCLayout->addWidget(createBtn);
         createVPCScrollArea->setWidget(createVPCFrame);
     mainLayout->addWidget(createVPCScrollArea);
+}
+
+void VPCCreationDialog::subnetsRefreshButtonClicked(){
+
+    subnetsLWidget->clear();
+    for (const auto &subnetBundle : subnetBundles){
+        subnetsLWidget->addItem(subnetBundle.name->text());
+    }
 }
 
 void VPCCreationDialog::createVPCRequest(){
