@@ -35,7 +35,7 @@ void InfrastructureCoordinator::coordinateVPCCreation(
     for (const auto &rt : RTs){
         RTInfos.append(rt);
     }
-
+    emit coordinatorStageChanged("Starting VPC creation... %p%", 0);
     AWSManager::instance().createVPCAsync(vpc, CIDR);
 }
 
@@ -43,7 +43,10 @@ void InfrastructureCoordinator::coordinateSubnetsCreation(QString vpcId){
 
     vpcID = vpcId;
     qDebug() << "VPC created: " + vpcID;
+    emit coordinatorStageChanged("VPC created... %p%", 30);
+
     subnetIndex = 0;
+    emit coordinatorStageChanged("Starting Subnet creation... %p%", 30);
     createNextSubnet();
 }
 
@@ -52,11 +55,16 @@ void InfrastructureCoordinator::createNextSubnet(){
     if (subnetIndex >= subnetInfos.size()){
         qDebug() << "All subnets created";
 
+        emit coordinatorStageChanged("All Subnets created... %p%", 70);
+        emit coordinatorStageChanged("Creating Internet Gateway... %p%", 70);
+
         AWSManager::instance().createIGWAsync(vpcID, igwName);
         return;
     }
 
     auto subnet = subnetInfos[subnetIndex];
+
+    emit coordinatorStageChanged("Creating Subnet " + subnet.name + "... %p%", 30);
 
     AWSManager::instance().createSubnetAsync(
         vpcID,
@@ -80,6 +88,7 @@ void InfrastructureCoordinator::onIGWCreated(const QString &igwId){
 
     igwID = igwId;
     qDebug() << "IGW created: " + igwID;
+    emit coordinatorStageChanged("Interet Gateway created... %p%", 85);
 
     coordinateRTCreation();
 }
@@ -87,6 +96,7 @@ void InfrastructureCoordinator::onIGWCreated(const QString &igwId){
 void InfrastructureCoordinator::coordinateRTCreation(){
 
     rtIndex = 0;
+    emit coordinatorStageChanged("Creating Route Tables... %p%", 85);
     createNextRT();
 }
 
@@ -96,6 +106,7 @@ void InfrastructureCoordinator::createNextRT(){
 
         qDebug() << "VPC infrastructure completed";
         emit vpcInfrastructureFinished("Created VPC " + vpcName + " " + vpcID);
+        emit coordinatorStageChanged("VPC ready %p%", 100);
         return;
     }
 
@@ -106,6 +117,8 @@ void InfrastructureCoordinator::createNextRT(){
     for (const auto &subnetName : rt.subnets){
         subnetIDs.append(subnetNameToID[subnetName]);
     }
+
+    emit coordinatorStageChanged("Creating Route Table " + rt.name + "... %p%", 85);
 
     AWSManager::instance().createRTAsync(
         vpcID,
@@ -121,16 +134,3 @@ void InfrastructureCoordinator::onRTCreated(const QString &rtID){
     rtIndex++;
     createNextRT();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

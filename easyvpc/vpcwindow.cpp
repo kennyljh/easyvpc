@@ -8,6 +8,7 @@
 #include <vector>
 #include <QDialog>
 #include <QList>
+#include <QProgressBar>
 #include "vpccard.h"
 #include "awsmanager.h"
 #include "guiutil.h"
@@ -36,13 +37,18 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
         topBarFrame = new QFrame(centralWindow);
         topBarFrame->setFrameStyle(QFrame::Panel | QFrame::Raised);
         topBarLayout = new QHBoxLayout(topBarFrame);
-            easyVPCLabel = new QLabel("EasyVPC");
+            easyVPCLabel = new QLabel("EasyVPC", topBarFrame);
             easyVPCLabel->setObjectName("easyVPCLabel");
+            taskProgressBar = new QProgressBar(topBarFrame);
+            taskProgressBar->setFormat("Idling");
+            taskProgressBar->setMinimum(0);
+            taskProgressBar->setMaximum(100);
+            taskProgressBar->setValue(0);
             regionsCBox = new QComboBox(topBarFrame);
             connect(regionsCBox, &QComboBox::textActivated,
                         this, &VPCWindow::regionChangeTriggered);
         topBarLayout->addWidget(easyVPCLabel);
-        topBarLayout->addStretch();
+        topBarLayout->addWidget(taskProgressBar, 1);
         topBarLayout->addWidget(regionsCBox);
 
         myVPCBarFrame = new QFrame(centralWindow);
@@ -161,9 +167,13 @@ void VPCWindow::createVPCButtonClicked(){
     connect(dialog, &VPCCreationDialog::VPCCreationRequested,
                 coordinator, &InfrastructureCoordinator::coordinateVPCCreation);
 
-    // // inform vpc infrastructure done building
+    // inform vpc infrastructure done building
     connect(coordinator, &InfrastructureCoordinator::vpcInfrastructureFinished,
                 this, &VPCWindow::setStatusBar);
+
+    // update progress bar on provisioning stage
+    connect(coordinator, &InfrastructureCoordinator::coordinatorStageChanged,
+                this, &VPCWindow::coordinatorUpdated);
 
     dialog->exec();
 }
@@ -173,6 +183,12 @@ void VPCWindow::regionChangeTriggered(const QString &region){
     AWSManager::instance().setSelectedRegion(region);
     statusBar()->showMessage("Changing region to " + region);
     AWSManager::instance().getVPCsAsync();
+}
+
+void VPCWindow::coordinatorUpdated(const QString &msg, const int &val){
+
+    taskProgressBar->setFormat(msg);
+    taskProgressBar->setValue(val);
 }
 
 void VPCWindow::VPCCreationDataDebug(

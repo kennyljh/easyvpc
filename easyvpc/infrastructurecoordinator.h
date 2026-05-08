@@ -58,6 +58,8 @@ class InfrastructureCoordinator : public QObject{
         void vpcInfrastructureFinished(const QString &msg);
 
         void coordinatorError(const QString &err);
+
+        void coordinatorStageChanged(const QString &msg, const int &val);
 };
 
 #endif // INFRASTRUCTURECOORDINATOR_H

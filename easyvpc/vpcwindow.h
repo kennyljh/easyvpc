@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QStatusBar>
 #include <QMap>
+#include <QProgressBar>
 #include <aws/core/Aws.h>
 #include <aws/ec2/EC2Client.h>
 #include "vpccreationdialog.h"
@@ -40,6 +41,8 @@ class VPCWindow : public QMainWindow{
         QVBoxLayout *centralLayout;
 
         QLabel *easyVPCLabel;
+        QProgressBar *taskProgressBar;
+
         QComboBox *regionsCBox;
         QFrame *topBarFrame;
         QHBoxLayout *topBarLayout;
@@ -82,6 +85,8 @@ class VPCWindow : public QMainWindow{
         void createVPCButtonClicked();
 
         void regionChangeTriggered(const QString &region);
+
+        void coordinatorUpdated(const QString &msg, const int &val);
 
         /**
          * @brief VPCCreationDataDebug - to debug vpc creation request
