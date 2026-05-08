@@ -45,6 +45,8 @@ class VPCCreationDialog : public QDialog{
             QListWidget *subnets;
         };
 
+        QStringList AZones;
+
         std::vector<subnetBundle> subnetBundles;
         std::vector<RTBundle> RTBundles;
 
@@ -92,6 +94,10 @@ class VPCCreationDialog : public QDialog{
         void subnetsRefreshButtonClicked();
 
         void processZones(const std::vector<Aws::EC2::Model::AvailabilityZone> &zones);
+
+        void addSubnetFrame();
+
+        //void addRTFrame();
 
     signals:
         void VPCCreationRequested(

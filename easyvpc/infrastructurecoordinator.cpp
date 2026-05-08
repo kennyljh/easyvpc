@@ -13,6 +13,10 @@ InfrastructureCoordinator::InfrastructureCoordinator(QObject *parent)
                 this, &InfrastructureCoordinator::coordinateSubnetsCreation);
     connect(&AWSManager::instance(), &AWSManager::subnetCreated,
                 this, &InfrastructureCoordinator::onSubnetCreated);
+    connect(&AWSManager::instance(), &AWSManager::igwCreated,
+                this, &InfrastructureCoordinator::onIGWCreated);
+    connect(&AWSManager::instance(), &AWSManager::routeTableCreated,
+                this, &InfrastructureCoordinator::onRTCreated);
 }
 
 void InfrastructureCoordinator::coordinateVPCCreation(
@@ -97,11 +101,17 @@ void InfrastructureCoordinator::createNextRT(){
 
     auto rt = RTInfos[rtIndex];
 
+    QStringList subnetIDs;
+
+    for (const auto &subnetName : rt.subnets){
+        subnetIDs.append(subnetNameToID[subnetName]);
+    }
+
     AWSManager::instance().createRTAsync(
         vpcID,
         rt.name,
         igwID,
-        rt.subnets
+        subnetIDs
     );
 }
 

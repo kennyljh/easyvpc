@@ -39,7 +39,7 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
             vpcNameEdt->setPlaceholderText("my-vpc-01");
             vpcIPv4CIDRLabel = new QLabel("VPC IPv4 CIDR", createVPCFrame);
             vpcIPv4CIDREdt = new QLineEdit(createVPCFrame);
-            vpcIPv4CIDREdt->setPlaceholderText("10.0.0.0/24");
+            vpcIPv4CIDREdt->setPlaceholderText("10.0.0.0/16");
         createVPCLayout->addWidget(vpcNameLabel);
         createVPCLayout->addWidget(vpcNameEdt);
         createVPCLayout->addWidget(vpcIPv4CIDRLabel);
@@ -67,6 +67,8 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
                 subnetBundles.push_back(*subnet);
 
                 addSubnetBtn = new QPushButton("Add", subnetsFrame);
+                connect(addSubnetBtn, &QPushButton::clicked,
+                            this, &VPCCreationDialog::addSubnetFrame);
             subnetsLayout->addWidget(subnetNameLabel);
             subnetsLayout->addWidget(subnetNameEdt);
             subnetsLayout->addWidget(AZsLabel);
@@ -145,6 +147,10 @@ void VPCCreationDialog::createVPCRequest(){
         info->name = subnetBundle.name->text();
         info->zone = subnetBundle.zone->currentText();
         info->ipv4 = subnetBundle.ipv4->text();
+        if (info->name.isEmpty() || info->zone.isEmpty() || info->ipv4.isEmpty()){
+            qDebug() << "Found subnet with incomplete info";
+            continue;
+        }
         subnetInfos.append(*info);
         qDebug() << "Found subnet bundle: " + info->name + " " + info->zone + " " + info->ipv4;
     }
@@ -180,5 +186,44 @@ void VPCCreationDialog::processZones(const std::vector<Aws::EC2::Model::Availabi
 
     for (const auto &zone : zones){
         regionsCBox->addItem(QString::fromStdString(zone.GetZoneName()));
+        AZones.append(QString::fromStdString(zone.GetZoneName()));
     }
+}
+
+void VPCCreationDialog::addSubnetFrame(){
+
+    // removing add button
+    QLayoutItem *item = subnetsLayout->takeAt(subnetsLayout->count() - 1);
+    if (item->widget()) delete item->widget();
+    delete item;
+
+    QLabel *subnetNameLabel = new QLabel("Subnet Name", subnetsFrame);
+    QLineEdit *subnetNameEdt = new QLineEdit(subnetsFrame);
+    subnetNameEdt->setPlaceholderText("my-subnet-01");
+    QLabel *AZsLabel = new QLabel("Availability Zones", subnetsFrame);
+    QComboBox *regionsCBox = new QComboBox(subnetsFrame);
+    QLabel *subnetIPv4CIDRLabel = new QLabel("Subnet IPv4 CIDR", subnetsFrame);
+    QLineEdit *subnetIPv4CIDREdt = new QLineEdit(subnetsFrame);
+    subnetIPv4CIDREdt->setPlaceholderText("10.0.1.0/24");
+
+    subnetBundle *subnet = new subnetBundle();
+    subnet->name = subnetNameEdt;
+    subnet->zone = regionsCBox;
+    subnet->ipv4 = subnetIPv4CIDREdt;
+    subnetBundles.push_back(*subnet);
+
+    QPushButton *addSubnetBtn = new QPushButton("Add", subnetsFrame);
+    connect(addSubnetBtn, &QPushButton::clicked,
+                this, &VPCCreationDialog::addSubnetFrame);
+
+    subnetsLayout->addSpacing(10);
+    subnetsLayout->addWidget(subnetNameLabel);
+    subnetsLayout->addWidget(subnetNameEdt);
+    subnetsLayout->addWidget(AZsLabel);
+    subnetsLayout->addWidget(regionsCBox);
+    subnetsLayout->addWidget(subnetIPv4CIDRLabel);
+    subnetsLayout->addWidget(subnetIPv4CIDREdt);
+    subnetsLayout->addWidget(addSubnetBtn);
+
+
 }
