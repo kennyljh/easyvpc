@@ -13,9 +13,13 @@
 #include <QAbstractItemView>
 #include <QFont>
 #include <QList>
+#include <awsmanager.h>
 
 VPCCreationDialog::VPCCreationDialog(QWidget *parent)
                   : QDialog(parent){
+
+    connect(&AWSManager::instance(), &AWSManager::zonesReady,
+                this, &VPCCreationDialog::processZones);
 
     setWindowTitle("Create VPC");
     resize(650, 680);
@@ -52,8 +56,6 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
                 subnetNameEdt->setPlaceholderText("my-subnet-01");
                 AZsLabel = new QLabel("Availability Zones", subnetsFrame);
                 regionsCBox = new QComboBox(subnetsFrame);
-                // todo - retrieve from api call
-                regionsCBox->addItems({"us-east-1a", "us-east-1b"});
                 subnetIPv4CIDRLabel = new QLabel("Subnet IPv4 CIDR", subnetsFrame);
                 subnetIPv4CIDREdt = new QLineEdit(subnetsFrame);
                 subnetIPv4CIDREdt->setPlaceholderText("10.0.1.0/24");
@@ -119,6 +121,9 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
         createVPCLayout->addWidget(createBtn);
         createVPCScrollArea->setWidget(createVPCFrame);
     mainLayout->addWidget(createVPCScrollArea);
+
+    // api calls
+    AWSManager::instance().getZonesAsync();
 }
 
 void VPCCreationDialog::subnetsRefreshButtonClicked(){
@@ -171,24 +176,9 @@ void VPCCreationDialog::createVPCRequest(){
     accept();
 }
 
+void VPCCreationDialog::processZones(const std::vector<Aws::EC2::Model::AvailabilityZone> &zones){
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    for (const auto &zone : zones){
+        regionsCBox->addItem(QString::fromStdString(zone.GetZoneName()));
+    }
+}

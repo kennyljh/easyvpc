@@ -103,6 +103,8 @@ class AWSManager : public QObject {
          */
         void getIGWByVPCIdAsync(QString vpcID);
 
+        void getZonesAsync();
+
         void createVPCAsync(QString vpcName, QString vpcCIDR);
 
         void createSubnetAsync(
@@ -177,6 +179,8 @@ class AWSManager : public QObject {
          * @param IGW
          */
         void IGWByVPCIdReady(const QString &vpcId, const std::vector<Aws::EC2::Model::InternetGateway> &IGW);
+
+        void zonesReady(const std::vector<Aws::EC2::Model::AvailabilityZone> &zones);
 
         /**
          * @brief apiError - signals when there is an api call error

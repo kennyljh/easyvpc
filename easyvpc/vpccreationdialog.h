@@ -14,6 +14,8 @@
 #include <vector>
 #include <QList>
 #include <QStringList>
+#include <aws/core/Aws.h>
+#include <aws/ec2/EC2Client.h>
 
 class VPCCreationDialog : public QDialog{
     Q_OBJECT
@@ -89,7 +91,7 @@ class VPCCreationDialog : public QDialog{
     private slots:
         void subnetsRefreshButtonClicked();
 
-        // todo - slots for adding new subnets and rts
+        void processZones(const std::vector<Aws::EC2::Model::AvailabilityZone> &zones);
 
     signals:
         void VPCCreationRequested(

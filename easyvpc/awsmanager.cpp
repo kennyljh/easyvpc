@@ -358,6 +358,41 @@ void AWSManager::getIGWByVPCIdAsync(QString vpcID){
     });
 }
 
+void AWSManager::getZonesAsync(){
+
+    QString region = selectedRegion;
+
+    QtConcurrent::run([this, region]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        Aws::EC2::Model::DescribeAvailabilityZonesRequest request;
+
+        auto outcome = ec2.DescribeAvailabilityZones(request);
+
+        if (!outcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(outcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+        }
+        else {
+
+            auto zones = outcome.GetResult().GetAvailabilityZones();
+
+            QMetaObject::invokeMethod(this, [this, zones]() {
+                emit zonesReady(zones);
+                qDebug() << "Found " + QString::number(zones.size()) + " zones";
+            });
+        }
+    });
+}
+
 void AWSManager::createVPCAsync(QString vpcName, QString vpcCIDR){
 
     QString profile = selectedProfile;
