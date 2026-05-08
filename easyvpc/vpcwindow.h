@@ -81,6 +81,8 @@ class VPCWindow : public QMainWindow{
 
         void createVPCButtonClicked();
 
+        void regionChangeTriggered(const QString &region);
+
         /**
          * @brief VPCCreationDataDebug - to debug vpc creation request
          * information retrieved from dialog

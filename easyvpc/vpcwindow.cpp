@@ -39,6 +39,8 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
             backToHubBtn = new QPushButton("EasyVPC", topBarFrame);
             regionsCBox = new QComboBox(topBarFrame);
             regionsCBox->addItem("us-east-1");
+            connect(regionsCBox, &QComboBox::currentTextChanged,
+                        this, &VPCWindow::regionChangeTriggered);
         topBarLayout->addWidget(backToHubBtn);
         topBarLayout->addStretch();
         topBarLayout->addWidget(regionsCBox);
@@ -155,14 +157,21 @@ void VPCWindow::createVPCButtonClicked(){
                 this, &VPCWindow::VPCCreationDataDebug);
 
     // connect to coordinator
-    // connect(dialog, &VPCCreationDialog::VPCCreationRequested,
-    //             coordinator, &InfrastructureCoordinator::coordinateVPCCreation);
+    connect(dialog, &VPCCreationDialog::VPCCreationRequested,
+                coordinator, &InfrastructureCoordinator::coordinateVPCCreation);
 
     // // inform vpc infrastructure done building
-    // connect(coordinator, &InfrastructureCoordinator::vpcInfrastructureFinished,
-    //             this, &VPCWindow::setStatusBar);
+    connect(coordinator, &InfrastructureCoordinator::vpcInfrastructureFinished,
+                this, &VPCWindow::setStatusBar);
 
     dialog->exec();
+}
+
+void VPCWindow::regionChangeTriggered(const QString &region){
+
+    AWSManager::instance().setSelectedRegion(region);
+    statusBar()->showMessage("Changing region to " + region);
+    AWSManager::instance().getVPCsAsync();
 }
 
 void VPCWindow::VPCCreationDataDebug(
