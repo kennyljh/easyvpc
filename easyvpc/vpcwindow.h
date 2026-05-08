@@ -39,7 +39,7 @@ class VPCWindow : public QMainWindow{
         QWidget *centralWindow;
         QVBoxLayout *centralLayout;
 
-        QPushButton *backToHubBtn;
+        QLabel *easyVPCLabel;
         QComboBox *regionsCBox;
         QFrame *topBarFrame;
         QHBoxLayout *topBarLayout;

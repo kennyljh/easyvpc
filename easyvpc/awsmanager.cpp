@@ -107,6 +107,7 @@ void AWSManager::getVPCsAsync(){
         else {
 
             auto vpcs = outcome.GetResult().GetVpcs();
+            qDebug() << "Found VPCs for region: " + region;
 
             QMetaObject::invokeMethod(this, [this, vpcs]() {
                 emit vpcsReady(vpcs);
