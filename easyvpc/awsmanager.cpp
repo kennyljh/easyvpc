@@ -109,6 +109,11 @@ void AWSManager::getVPCsAsync(){
             auto vpcs = outcome.GetResult().GetVpcs();
             qDebug() << "Found VPCs for region: " + region;
 
+            for (const auto &vpc : vpcs){
+                vpcDetails detail;
+                vpcIDCache[QString::fromStdString(vpc.GetVpcId())] = detail;
+            }
+
             QMetaObject::invokeMethod(this, [this, vpcs]() {
                 emit vpcsReady(vpcs);
             });
@@ -148,6 +153,8 @@ void AWSManager::getSubnetsAsync(QString vpcID){
         else {
 
             auto subnets = outcome.GetResult().GetSubnets();
+
+            vpcIDCache[id].subnets = subnets;
 
             QMetaObject::invokeMethod(this, [this, id, subnets]() {
                 emit subnetsReady(id, subnets);
@@ -310,6 +317,8 @@ void AWSManager::getRTsByVPCIdAsync(QString vpcID){
 
             auto RTs = outcome.GetResult().GetRouteTables();
 
+            vpcIDCache[id].routeTables = RTs;
+
             QMetaObject::invokeMethod(this, [this, id, RTs]() {
                 emit RTsByVPCIdReady(id, RTs);
                 emit notifyStatus("Found " + QString::number(RTs.size()) + " route tables");
@@ -350,6 +359,8 @@ void AWSManager::getIGWByVPCIdAsync(QString vpcID){
         else {
 
             auto IGWs = outcome.GetResult().GetInternetGateways();
+
+            vpcIDCache[id].igw = IGWs;
 
             QMetaObject::invokeMethod(this, [this, id, IGWs]() {
                 emit IGWByVPCIdReady(id, IGWs);

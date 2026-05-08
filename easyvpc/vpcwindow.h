@@ -58,16 +58,6 @@ class VPCWindow : public QMainWindow{
          */
         void setStatusBar(QString msg);
 
-        /**
-         * @brief cacheSubnets - cache subnets to vpc cache
-         * @param subnets
-         */
-        void cacheSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets);
-
-        void cachesRTs(std::vector<Aws::EC2::Model::RouteTable> &RTs);
-
-        void cacheIGW(std::vector<Aws::EC2::Model::InternetGateway> &IGW);
-
         void refreshButtonClicked();
 
         void createVPCButtonClicked();

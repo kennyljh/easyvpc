@@ -124,14 +124,6 @@ void VPCWindow::processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs){
         myVPCLayout->addWidget(card);
         GUIUtil util;
         util.applyWidgetFade(card, 300);
-
-        // vpc caching
-        vpcDetails *detail = new vpcDetails;
-        detail->name = name;
-        detail->id = id;
-        detail->ipv4cidr = ipv4cidr;
-        detail->state = state;
-        vpcCache.insert(id, detail);
     }
     statusBar()->showMessage("Found " + QString::number(vpcs.size()) + " VPCs");
 }
@@ -139,13 +131,6 @@ void VPCWindow::processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs){
 void VPCWindow::setStatusBar(QString msg){
     qDebug() << "Status Bar: " + msg;
     statusBar()->showMessage(msg);
-}
-
-void VPCWindow::cacheSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets){
-
-    QString id = QString::fromStdString(subnets.front().GetVpcId());
-    vpcDetails *details = vpcCache.value(id);
-    details->subnets = subnets;
 }
 
 void VPCWindow::refreshButtonClicked(){
@@ -183,6 +168,7 @@ void VPCWindow::regionChangeTriggered(const QString &region){
     AWSManager::instance().setSelectedRegion(region);
     statusBar()->showMessage("Changing region to " + region);
     AWSManager::instance().getVPCsAsync();
+    AWSManager::instance().vpcIDCache.clear();
 }
 
 void VPCWindow::coordinatorUpdated(const QString &msg, const int &val){
