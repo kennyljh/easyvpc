@@ -103,6 +103,8 @@ class AWSManager : public QObject {
          */
         void getIGWByVPCIdAsync(QString vpcID);
 
+        void createVPCAsync();
+
     signals:
         /**
          * @brief regionsReady - signals when list of regions retrieved
@@ -168,6 +170,8 @@ class AWSManager : public QObject {
          * @param status
          */
         void notifyStatus(const QString &status);
+
+        void vpcCreatedAsync(const QString &vpcID);
 
     private:
         explicit AWSManager(QObject *parent = nullptr);

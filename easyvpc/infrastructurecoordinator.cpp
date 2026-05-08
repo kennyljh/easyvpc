@@ -1,3 +1,8 @@
 #include "infrastructurecoordinator.h"
 
-InfrastructureCoordinator::InfrastructureCoordinator() {}
+#include <QObject>
+
+InfrastructureCoordinator::InfrastructureCoordinator(QObject *parent)
+                          : QObject(parent) {}
+
+

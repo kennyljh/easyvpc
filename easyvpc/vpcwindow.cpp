@@ -13,6 +13,7 @@
 #include "guiutil.h"
 #include "vpccreationdialog.h"
 #include "vpccreationdialog.h"
+#include "infrastructurecoordinator.h"
 #include <aws/core/Aws.h>
 #include <aws/ec2/EC2Client.h>
 
@@ -147,9 +148,15 @@ void VPCWindow::refreshButtonClicked(){
 void VPCWindow::createVPCButtonClicked(){
 
     VPCCreationDialog *dialog = new VPCCreationDialog(this);
+    InfrastructureCoordinator *coordinator = new InfrastructureCoordinator(this);
 
+    // for debuggin purposes
     connect(dialog, &VPCCreationDialog::VPCCreationRequested,
                 this, &VPCWindow::VPCCreationDataDebug);
+
+    // connect to coordinator
+    connect(dialog, &VPCCreationDialog::VPCCreationRequested,
+                coordinator, &InfrastructureCoordinator::coordinateVPCCreation);
 
     dialog->exec();
 }
