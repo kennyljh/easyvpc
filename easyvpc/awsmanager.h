@@ -121,8 +121,8 @@ class AWSManager : public QObject {
             QString vpcID,
             QString RTName,
             QString igwID,
-            QString subnetID
-        )
+            QStringList subnetIDs
+        );
 
     signals:
         /**
@@ -197,6 +197,7 @@ class AWSManager : public QObject {
 
         void igwCreated(const QString &igwID);
 
+        void routeTableCreated(const QString &rtID);
 
     private:
         explicit AWSManager(QObject *parent = nullptr);

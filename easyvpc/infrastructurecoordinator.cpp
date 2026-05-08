@@ -77,10 +77,40 @@ void InfrastructureCoordinator::onIGWCreated(const QString &igwId){
     igwID = igwId;
     qDebug() << "IGW created: " + igwID;
 
-    // coordinate next
-
+    coordinateRTCreation();
 }
 
+void InfrastructureCoordinator::coordinateRTCreation(){
+
+    rtIndex = 0;
+    createNextRT();
+}
+
+void InfrastructureCoordinator::createNextRT(){
+
+    if (rtIndex >= RTInfos.size()){
+
+        qDebug() << "VPC infrastructure completed";
+        emit vpcInfrastructureFinished("Created VPC " + vpcName + " " + vpcID);
+        return;
+    }
+
+    auto rt = RTInfos[rtIndex];
+
+    AWSManager::instance().createRTAsync(
+        vpcID,
+        rt.name,
+        igwID,
+        rt.subnets
+    );
+}
+
+void InfrastructureCoordinator::onRTCreated(const QString &rtID){
+
+    qDebug() << "Created RT: " + rtID;
+    rtIndex++;
+    createNextRT();
+}
 
 
 

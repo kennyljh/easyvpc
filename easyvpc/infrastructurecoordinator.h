@@ -28,7 +28,13 @@ class InfrastructureCoordinator : public QObject{
 
         int subnetIndex;
 
+        int rtIndex;
+
         void createNextSubnet();
+
+        void coordinateRTCreation();
+
+        void createNextRT();
 
     public slots:
         void coordinateVPCCreation(
@@ -46,8 +52,12 @@ class InfrastructureCoordinator : public QObject{
 
         void onIGWCreated(const QString &igwID);
 
+        void onRTCreated(const QString &rtID);
+
     signals:
-        void coordinatorError(QString err);
+        void vpcInfrastructureFinished(const QString &msg);
+
+        void coordinatorError(const QString &err);
 };
 
 #endif // INFRASTRUCTURECOORDINATOR_H

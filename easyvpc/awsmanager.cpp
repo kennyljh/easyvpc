@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QtConcurrent>
 #include <vector>
+#include <QStringList>
+#include <QString>
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentialsProviderChain.h>
 #include <aws/ec2/EC2Client.h>
@@ -13,6 +15,9 @@
 #include <aws/ec2/model/ModifySubnetAttributeRequest.h>
 #include <aws/ec2/model/CreateInternetGatewayRequest.h>
 #include <aws/ec2/model/AttachInternetGatewayRequest.h>
+#include <aws/ec2/model/CreateRouteTableRequest.h>
+#include <aws/ec2/model/CreateRouteRequest.h>
+#include <aws/ec2/model/AssociateRouteTableRequest.h>
 
 AWSManager::AWSManager(QObject *parent) : QObject(parent) {}
 
@@ -541,9 +546,7 @@ void AWSManager::createIGWAsync(QString vpcID,
         // add name tag
         Aws::EC2::Model::CreateTagsRequest tagRequest;
 
-        tagRequest.AddResources(
-            igw.GetInternetGatewayId()
-        );
+        tagRequest.AddResources(igw.GetInternetGatewayId());
 
         Aws::EC2::Model::Tag nameTag;
 
@@ -557,16 +560,11 @@ void AWSManager::createIGWAsync(QString vpcID,
         // attach to vpc
         Aws::EC2::Model::AttachInternetGatewayRequest attachRequest;
 
-        attachRequest.SetInternetGatewayId(
-            igw.GetInternetGatewayId()
-        );
+        attachRequest.SetInternetGatewayId(igw.GetInternetGatewayId());
 
-        attachRequest.SetVpcId(
-            vpcID.toStdString()
-        );
+        attachRequest.SetVpcId(vpcID.toStdString());
 
-        auto attachOutcome =
-            ec2.AttachInternetGateway(attachRequest);
+        auto attachOutcome = ec2.AttachInternetGateway(attachRequest);
 
         if (!attachOutcome.IsSuccess()) {
 
@@ -582,6 +580,111 @@ void AWSManager::createIGWAsync(QString vpcID,
         QMetaObject::invokeMethod(this, [this, igwID]() {
             emit igwCreated(igwID);
         }, Qt::QueuedConnection);
+    });
+}
+
+void AWSManager::createRTAsync(QString vpcID,
+                        QString RTName,
+                        QString igwID,
+                        QStringList subnetIDs){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+
+    QtConcurrent::run([this, profile, region,
+                        vpcID, RTName, igwID, subnetIDs]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        // create rt
+        Aws::EC2::Model::CreateRouteTableRequest rtRequest;
+
+        rtRequest.SetVpcId(vpcID.toStdString());
+
+        auto rtOutcome = ec2.CreateRouteTable(rtRequest);
+
+        if (!rtOutcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(rtOutcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+            return;
+        }
+
+        auto rt = rtOutcome.GetResult().GetRouteTable();
+
+        QString rtID =
+            QString::fromStdString(
+                rt.GetRouteTableId()
+            );
+
+        // add name tag
+        Aws::EC2::Model::CreateTagsRequest tagRequest;
+
+        tagRequest.AddResources(rt.GetRouteTableId());
+
+        Aws::EC2::Model::Tag nameTag;
+
+        nameTag.SetKey("Name");
+        nameTag.SetValue(RTName.toStdString());
+
+        tagRequest.AddTags(nameTag);
+
+        ec2.CreateTags(tagRequest);
+
+        // add default route
+        Aws::EC2::Model::CreateRouteRequest routeRequest;
+
+        routeRequest.SetRouteTableId(rt.GetRouteTableId());
+
+        routeRequest.SetDestinationCidrBlock("0.0.0.0/0");
+
+        routeRequest.SetGatewayId(igwID.toStdString());
+
+        auto routeOutcome = ec2.CreateRoute(routeRequest);
+
+        if (!routeOutcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(routeOutcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+            return;
+        }
+
+        // associate subnets
+        for (const QString &subnetID : subnetIDs) {
+
+            Aws::EC2::Model::AssociateRouteTableRequest assocRequest;
+
+            assocRequest.SetRouteTableId(rt.GetRouteTableId());
+
+            assocRequest.SetSubnetId(subnetID.toStdString());
+
+            auto assocOutcome = ec2.AssociateRouteTable(assocRequest);
+
+            if (!assocOutcome.IsSuccess()) {
+
+                QString err = QString::fromStdString(assocOutcome.GetError().GetMessage());
+
+                QMetaObject::invokeMethod(this, [=]() {
+                    emit apiError(err);
+                });
+                return;
+            }
+        }
+
+        // emit success signal
+        QMetaObject::invokeMethod(this, [this, rtID]() {
+            emit routeTableCreated(rtID);
+        });
     });
 }
 
