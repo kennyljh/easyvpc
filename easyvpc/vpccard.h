@@ -115,7 +115,8 @@ class VPCCard : public QFrame{
         void vpcExpandTriggered();
 
         void vpcMinimizeTriggered();
-        // void deleteButtonClicked();
+
+        void deleteVPCButtonClicked();
 };
 
 #endif // VPCCARD_H

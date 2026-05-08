@@ -31,6 +31,7 @@ RTCard::RTCard(const QString &vpcid, const QString &name, const QString &rtid,
             RTNameLabel = new QLabel(name, RTTopFrame);
             RTNameLabel->setFont(qfontB13);
             deleteRTBtn = new QPushButton("Delete", RTTopFrame);
+            deleteRTBtn->hide();
         RTTopLayout->addWidget(RTNameLabel);
         RTTopLayout->addStretch();
         RTTopLayout->addWidget(deleteRTBtn);

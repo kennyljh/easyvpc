@@ -14,6 +14,7 @@
 #include "subnetcard.h"
 #include "guiutil.h"
 #include "rtcard.h"
+#include "infrastructurecoordinator.h"
 
 VPCCard::VPCCard(const QString &name, const QString &id,
                             const QString &ipv4cidr, const QString &state,
@@ -50,6 +51,8 @@ VPCCard::VPCCard(const QString &name, const QString &id,
             connect(minimizeBtn, &QPushButton::clicked, this, &VPCCard::vpcMinimizeTriggered);
             minimizeBtn->hide();
             deleteBtn = new QPushButton("Delete", vpcTitleFrame);
+            connect(deleteBtn, &QPushButton::clicked,
+                        this, &VPCCard::deleteVPCButtonClicked);
         vpcTitleLayout->addWidget(vpcName);
         vpcTitleLayout->addStretch();
         vpcTitleLayout->addWidget(expandBtn);
@@ -87,6 +90,7 @@ void VPCCard::expandCard(){
             subnetLabel = new QLabel("Subnets", subnetTopFrame);
             subnetLabel->setFont(qfontB15);
             addSubnetBtn = new QPushButton("Add", subnetTopFrame);
+            addSubnetBtn->hide();
         subnetTopLayout->addWidget(subnetLabel);
         subnetTopLayout->addStretch();
         subnetTopLayout->addWidget(addSubnetBtn);
@@ -115,6 +119,7 @@ void VPCCard::expandCard(){
             RTLabel = new QLabel("Route Tables", RTTopFrame);
             RTLabel->setFont(qfontB15);
             addRTBtn = new QPushButton("Add", RTTopFrame);
+            addRTBtn->hide();
         RTTopLayout->addWidget(RTLabel);
         RTTopLayout->addStretch();
         RTTopLayout->addWidget(addRTBtn);
@@ -372,3 +377,28 @@ void VPCCard::vpcMinimizeTriggered(){
         delete item;
     }
 }
+
+void VPCCard::deleteVPCButtonClicked(){
+
+    InfrastructureCoordinator *coordinator = new InfrastructureCoordinator(this);
+    coordinator->coordinateVPCInfrastructureDeletion(vpcID);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -17,6 +17,15 @@ InfrastructureCoordinator::InfrastructureCoordinator(QObject *parent)
                 this, &InfrastructureCoordinator::onIGWCreated);
     connect(&AWSManager::instance(), &AWSManager::routeTableCreated,
                 this, &InfrastructureCoordinator::onRTCreated);
+
+    connect(&AWSManager::instance(), &AWSManager::RTsDeletionCompleted,
+                this, &InfrastructureCoordinator::coordinateIGWDeletion);
+    connect(&AWSManager::instance(), &AWSManager::IGWDeletionCompleted,
+                this, &InfrastructureCoordinator::coordinateSubnetsDeletion);
+    connect(&AWSManager::instance(), &AWSManager::SubnetsDeletionCompleted,
+                this, &InfrastructureCoordinator::coordinateVPCDeletion);
+    connect(&AWSManager::instance(), &AWSManager::VPCDeletionCompleted,
+                this, &InfrastructureCoordinator::coordinateVPCDeletionCompleted);
 }
 
 void InfrastructureCoordinator::coordinateVPCCreation(
@@ -133,4 +142,38 @@ void InfrastructureCoordinator::onRTCreated(const QString &rtID){
     qDebug() << "Created RT: " + rtID;
     rtIndex++;
     createNextRT();
+}
+
+void InfrastructureCoordinator::coordinateVPCInfrastructureDeletion(const QString &vpcID){
+
+    qDebug() << "Coordinating VPC deletion for: " + vpcID;
+    emit coordinatorStageChanged("Starting VPC" + vpcID + " deletion... %p%", 0);
+    AWSManager::instance().deleteRTsByVPCIdAsync(vpcID);
+}
+
+void InfrastructureCoordinator::coordinateIGWDeletion(const QString &vpcID){
+
+    emit coordinatorStageChanged("Route tables deleted... %p%", 30);
+    emit coordinatorStageChanged("Starting Internet Gateway deletion... %p%", 30);
+    AWSManager::instance().deleteIGWByVPCIdAsync(vpcID);
+}
+
+void InfrastructureCoordinator::coordinateSubnetsDeletion(const QString &vpcID){
+
+    emit coordinatorStageChanged("Internet Gateway deleted... %p%", 60);
+    emit coordinatorStageChanged("Starting Subnets deletion... %p%", 60);
+    AWSManager::instance().deleteSubnetsByVPCIdAsync(vpcID);
+}
+
+void InfrastructureCoordinator::coordinateVPCDeletion(const QString &vpcID){
+
+    emit coordinatorStageChanged("Subnets deleted... %p%", 90);
+    emit coordinatorStageChanged("Starting VPC deletion... %p%", 90);
+    AWSManager::instance().deleteVPCByVPCIdAsync(vpcID);
+}
+
+void InfrastructureCoordinator::coordinateVPCDeletionCompleted(const QString &vpcID){
+
+    emit coordinatorStageChanged("VPC " + vpcID + " successfully deleted %p%", 100);
+    emit vpcInfrastructureDeleted("VPC " + vpcID + " successfully deleted");
 }

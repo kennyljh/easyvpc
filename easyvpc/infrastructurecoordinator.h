@@ -54,7 +54,15 @@ class InfrastructureCoordinator : public QObject{
 
         void onRTCreated(const QString &rtID);
 
+        void coordinateVPCInfrastructureDeletion(const QString &vpcID);
+
+        void coordinateIGWDeletion(const QString &vpcID);
+
+        void coordinateSubnetsDeletion(const QString &vpcID);
+
         void coordinateVPCDeletion(const QString &vpcID);
+
+        void coordinateVPCDeletionCompleted(const QString &vpcID);
 
     signals:
         void vpcInfrastructureFinished(const QString &msg);
@@ -62,6 +70,8 @@ class InfrastructureCoordinator : public QObject{
         void coordinatorError(const QString &err);
 
         void coordinatorStageChanged(const QString &msg, const int &val);
+
+        void vpcInfrastructureDeleted(const QString &msg);
 };
 
 #endif // INFRASTRUCTURECOORDINATOR_H

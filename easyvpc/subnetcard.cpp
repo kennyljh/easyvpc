@@ -78,6 +78,7 @@ SubnetCard::SubnetCard(const QString &vpcid, const QString &name, const QString 
                     ec2sLabel = new QLabel("EC2s", ec2sTopFrame);
                     ec2sLabel->setFont(qfontB13);
                     ec2sManageBtn = new QPushButton("Manage", ec2sTopFrame);
+                    ec2sManageBtn->hide();
                 ec2sTopLayout->addWidget(ec2sLabel);
                 ec2sTopLayout->addStretch();
                 ec2sTopLayout->addWidget(ec2sManageBtn);
