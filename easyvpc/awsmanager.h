@@ -103,7 +103,26 @@ class AWSManager : public QObject {
          */
         void getIGWByVPCIdAsync(QString vpcID);
 
-        void createVPCAsync();
+        void createVPCAsync(QString vpcName, QString vpcCIDR);
+
+        void createSubnetAsync(
+            QString vpcID,
+            QString subnetName,
+            QString zone,
+            QString CIDR
+        );
+
+        void createIGWAsync(
+            QString vpcID,
+            QString igwName
+        );
+
+        void createRTAsync(
+            QString vpcID,
+            QString RTName,
+            QString igwID,
+            QString subnetID
+        )
 
     signals:
         /**
@@ -171,7 +190,13 @@ class AWSManager : public QObject {
          */
         void notifyStatus(const QString &status);
 
-        void vpcCreatedAsync(const QString &vpcID);
+        void vpcCreated(const QString &vpcID);
+
+        void subnetCreated(const QString &subnetID,
+                            const QString &subnetName);
+
+        void igwCreated(const QString &igwID);
+
 
     private:
         explicit AWSManager(QObject *parent = nullptr);

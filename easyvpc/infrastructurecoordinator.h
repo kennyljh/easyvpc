@@ -17,9 +17,18 @@ class InfrastructureCoordinator : public QObject{
         explicit InfrastructureCoordinator(QObject *parent = nullptr);
 
     private:
+        QString vpcName;
+        QString vpcCIDR;
+        QList<VPCCreationDialog::subnetInfo> subnetInfos;
+        QString igwName;
+        QList<VPCCreationDialog::RTInfo> RTInfos;
         QString vpcID;
         QMap<QString, QString> subnetNameToID;
         QString igwID;
+
+        int subnetIndex;
+
+        void createNextSubnet();
 
     public slots:
         void coordinateVPCCreation(
@@ -30,11 +39,14 @@ class InfrastructureCoordinator : public QObject{
             const QList<VPCCreationDialog::RTInfo> &RTInfos
         );
 
+        void coordinateSubnetsCreation(QString vpcID);
+
+        void onSubnetCreated(const QString &subnetID,
+                                const QString &subnetName);
+
+        void onIGWCreated(const QString &igwID);
+
     signals:
-        void vpcCreationDone();
-        void subnetCreationDone();
-        void igwCreationDone();
-        void rtCreationDone();
         void coordinatorError(QString err);
 };
 

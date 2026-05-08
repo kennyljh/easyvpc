@@ -7,6 +7,12 @@
 #include <aws/core/Aws.h>
 #include <aws/core/auth/AWSCredentialsProviderChain.h>
 #include <aws/ec2/EC2Client.h>
+#include <aws/ec2/model/CreateTagsRequest.h>
+#include <aws/ec2/model/ModifyVpcAttributeRequest.h>
+#include <aws/ec2/model/CreateSubnetRequest.h>
+#include <aws/ec2/model/ModifySubnetAttributeRequest.h>
+#include <aws/ec2/model/CreateInternetGatewayRequest.h>
+#include <aws/ec2/model/AttachInternetGatewayRequest.h>
 
 AWSManager::AWSManager(QObject *parent) : QObject(parent) {}
 
@@ -346,3 +352,255 @@ void AWSManager::getIGWByVPCIdAsync(QString vpcID){
         }
     });
 }
+
+void AWSManager::createVPCAsync(QString vpcName, QString vpcCIDR){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+
+    QtConcurrent::run([this, profile, region, vpcName, vpcCIDR]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        // vpc creation
+        Aws::EC2::Model::CreateVpcRequest request;
+        request.SetCidrBlock(vpcCIDR.toStdString());
+
+        auto outcome = ec2.CreateVpc(request);
+
+        if (!outcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(outcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+            return;
+        }
+
+        // get created vpc
+        auto vpc = outcome.GetResult().GetVpc();
+
+        QString vpcID = QString::fromStdString(vpc.GetVpcId());
+
+        // add vpc name tag
+        Aws::EC2::Model::CreateTagsRequest tagRequest;
+
+        tagRequest.AddResources(vpc.GetVpcId());
+
+        Aws::EC2::Model::Tag nameTag;
+        nameTag.SetKey("Name");
+        nameTag.SetValue(vpcName.toStdString());
+
+        tagRequest.AddTags(nameTag);
+
+        ec2.CreateTags(tagRequest);
+
+        // enable dns support
+        Aws::EC2::Model::ModifyVpcAttributeRequest dnsSupport;
+        dnsSupport.SetVpcId(vpc.GetVpcId());
+
+        Aws::EC2::Model::AttributeBooleanValue dnsSupportValue;
+        dnsSupportValue.SetValue(true);
+
+        dnsSupport.SetEnableDnsSupport(dnsSupportValue);
+
+        ec2.ModifyVpcAttribute(dnsSupport);
+
+        // enable dns hostnames
+        Aws::EC2::Model::ModifyVpcAttributeRequest dnsHostnames;
+        dnsHostnames.SetVpcId(vpc.GetVpcId());
+
+        Aws::EC2::Model::AttributeBooleanValue dnsHostnamesValue;
+        dnsHostnamesValue.SetValue(true);
+
+        dnsHostnames.SetEnableDnsHostnames(dnsHostnamesValue);
+
+        ec2.ModifyVpcAttribute(dnsHostnames);
+
+        // emit success signal
+        QMetaObject::invokeMethod(this, [this, vpcID]{
+           emit vpcCreated(vpcID);
+           qDebug() << "Created VPC: " + vpcID;
+        });
+    });
+}
+
+void AWSManager::createSubnetAsync(QString vpcID,
+                        QString subnetName,
+                        QString zone,
+                        QString CIDR){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+
+    QtConcurrent::run([this, profile, region, vpcID, subnetName, zone, CIDR]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        // create subnet
+        Aws::EC2::Model::CreateSubnetRequest request;
+
+        request.SetVpcId(vpcID.toStdString());
+        request.SetAvailabilityZone(zone.toStdString());
+        request.SetCidrBlock(CIDR.toStdString());
+
+        auto outcome = ec2.CreateSubnet(request);
+
+        if (!outcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(outcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+            return;
+        }
+
+        auto subnet = outcome.GetResult().GetSubnet();
+
+        QString subnetID =
+            QString::fromStdString(subnet.GetSubnetId());
+
+        // add name tag
+        Aws::EC2::Model::CreateTagsRequest tagRequest;
+
+        tagRequest.AddResources(subnet.GetSubnetId());
+
+        Aws::EC2::Model::Tag nameTag;
+        nameTag.SetKey("Name");
+        nameTag.SetValue(subnetName.toStdString());
+
+        tagRequest.AddTags(nameTag);
+
+        ec2.CreateTags(tagRequest);
+
+        // enable public ip auto assign
+        Aws::EC2::Model::ModifySubnetAttributeRequest subnetAttr;
+
+        subnetAttr.SetSubnetId(subnet.GetSubnetId());
+
+        Aws::EC2::Model::AttributeBooleanValue publicIP;
+        publicIP.SetValue(true);
+
+        subnetAttr.SetMapPublicIpOnLaunch(publicIP);
+
+        ec2.ModifySubnetAttribute(subnetAttr);
+
+        // emit success signal
+        QMetaObject::invokeMethod(this, [this, subnetID, subnetName]() {
+            emit subnetCreated(subnetID, subnetName);
+        }, Qt::QueuedConnection);
+    });
+}
+
+void AWSManager::createIGWAsync(QString vpcID,
+                    QString igwName){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+
+    QtConcurrent::run([this, profile, region, vpcID, igwName]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        // create igw
+        Aws::EC2::Model::CreateInternetGatewayRequest request;
+
+        auto outcome = ec2.CreateInternetGateway(request);
+
+        if (!outcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(outcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+            return;
+        }
+
+        auto igw = outcome.GetResult().GetInternetGateway();
+
+        QString igwID =
+            QString::fromStdString(
+                igw.GetInternetGatewayId()
+            );
+
+        // add name tag
+        Aws::EC2::Model::CreateTagsRequest tagRequest;
+
+        tagRequest.AddResources(
+            igw.GetInternetGatewayId()
+        );
+
+        Aws::EC2::Model::Tag nameTag;
+
+        nameTag.SetKey("Name");
+        nameTag.SetValue(igwName.toStdString());
+
+        tagRequest.AddTags(nameTag);
+
+        ec2.CreateTags(tagRequest);
+
+        // attach to vpc
+        Aws::EC2::Model::AttachInternetGatewayRequest attachRequest;
+
+        attachRequest.SetInternetGatewayId(
+            igw.GetInternetGatewayId()
+        );
+
+        attachRequest.SetVpcId(
+            vpcID.toStdString()
+        );
+
+        auto attachOutcome =
+            ec2.AttachInternetGateway(attachRequest);
+
+        if (!attachOutcome.IsSuccess()) {
+
+            QString err = QString::fromStdString(attachOutcome.GetError().GetMessage());
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+            return;
+        }
+
+        // emit success signal
+        QMetaObject::invokeMethod(this, [this, igwID]() {
+            emit igwCreated(igwID);
+        }, Qt::QueuedConnection);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
