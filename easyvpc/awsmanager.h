@@ -4,6 +4,7 @@
 #include <QObject>
 #include <vector>
 #include <QString>
+#include <QMap>
 #include <aws/core/Aws.h>
 #include <aws/ec2/EC2Client.h>
 
@@ -18,6 +19,22 @@ class AWSManager : public QObject {
 
         AWSManager(const AWSManager&) = delete;
         AWSManager &operator=(const AWSManager&) = delete;
+
+        struct vpcDetails{
+            QString name;
+            QString id;
+            QString ipv4cidr;
+            QString state;
+
+            std::vector<Aws::EC2::Model::Subnet> subnets;
+            std::vector<Aws::EC2::Model::RouteTable> routeTables;
+            std::vector<Aws::EC2::Model::InternetGateway> igw;
+            std::vector<Aws::EC2::Model::NatGateway> natGateways;
+            std::vector<Aws::EC2::Model::SecurityGroup> securityGroups;
+            std::vector<Aws::EC2::Model::NetworkAcl> acls;
+        };
+
+        QMap<QString, vpcDetails*> *vpcIDCache;
 
         /**
          * @brief initSDK - initializes SDK, should only be called

@@ -106,7 +106,7 @@ void InfrastructureCoordinator::createNextRT(){
 
         qDebug() << "VPC infrastructure completed";
         emit vpcInfrastructureFinished("Created VPC " + vpcName + " " + vpcID);
-        emit coordinatorStageChanged("VPC ready %p%", 100);
+        emit coordinatorStageChanged("VPC " + vpcName + " is ready %p%", 100);
         return;
     }
 

@@ -21,22 +21,6 @@ class VPCWindow : public QMainWindow{
         explicit VPCWindow(QWidget *parent = 0);
 
     private:
-        struct vpcDetails{
-            QString name;
-            QString id;
-            QString ipv4cidr;
-            QString state;
-
-            std::vector<Aws::EC2::Model::Subnet> subnets;
-            std::vector<Aws::EC2::Model::RouteTable> routeTables;
-            std::vector<Aws::EC2::Model::InternetGateway> igws;
-            std::vector<Aws::EC2::Model::NatGateway> natGateways;
-            std::vector<Aws::EC2::Model::SecurityGroup> securityGroups;
-            std::vector<Aws::EC2::Model::NetworkAcl> acls;
-        };
-
-        QMap<QString, vpcDetails*> vpcCache;
-
         QWidget *centralWindow;
         QVBoxLayout *centralLayout;
 
@@ -79,6 +63,10 @@ class VPCWindow : public QMainWindow{
          * @param subnets
          */
         void cacheSubnets(const std::vector<Aws::EC2::Model::Subnet> &subnets);
+
+        void cachesRTs(std::vector<Aws::EC2::Model::RouteTable> &RTs);
+
+        void cacheIGW(std::vector<Aws::EC2::Model::InternetGateway> &IGW);
 
         void refreshButtonClicked();
 

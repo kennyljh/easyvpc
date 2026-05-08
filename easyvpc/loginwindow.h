@@ -9,6 +9,7 @@
 #include <QStringList>
 #include <QLabel>
 #include <QHBoxLayout>
+#include <QFrame>
 
 class LoginWindow : public QMainWindow{
     Q_OBJECT
@@ -20,11 +21,18 @@ class LoginWindow : public QMainWindow{
 
         QWidget *centralWindow;
         QVBoxLayout *centralLayout;
+
+        QFrame *topBarFrame;
+        QHBoxLayout *topBarLayout;
+        QPushButton *helpBtn;
+
+        QFrame *connectFrame;
+        QHBoxLayout *connectLayout;
         QPushButton *connectBtn;
 
         QWidget *selectProfileWindow;
         QVBoxLayout *selectProfileLayout;
-        QLabel *profilesLineEdt;
+        QLabel *profilesLabel;
         QWidget *CBoxBtnWindow;
         QHBoxLayout *CBoxBtnLayout;
         QComboBox *profilesCBox;
@@ -46,6 +54,10 @@ class LoginWindow : public QMainWindow{
     private slots:
         void loginButtonClicked();
         void goButtonClicked();
+        void helpButtonClicked();
+
+    signals:
+        void loginIsSuccessful();
 };
 
 #endif // LOGINWINDOW_H

@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <vpcwindow.h>
 #include <QFile>
+#include <QObject>
 #include "loginwindow.h"
 #include "awsmanager.h"
 
@@ -12,13 +13,19 @@ int main(int argc, char *argv[]){
     if (file.open(QFile::ReadOnly)) app.setStyleSheet(QLatin1String(file.readAll()));
 
     AWSManager::instance().initSDK();
-    AWSManager::instance().setSelectedProfile("testing-profile");
 
-    // LoginWindow loginWindow;
-    // loginWindow.show();
+    LoginWindow loginWindow;
+    VPCWindow *vpcwindow = nullptr;
 
-    VPCWindow vpcwindow;
-    vpcwindow.show();
+    loginWindow.show();
+
+    QObject::connect(&loginWindow, &LoginWindow::loginIsSuccessful,
+                        [&](){
+        loginWindow.close();
+
+        vpcwindow = new VPCWindow();
+        vpcwindow->show();
+    });
 
     return app.exec();
 }

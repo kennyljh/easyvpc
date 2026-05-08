@@ -12,6 +12,7 @@ SOURCES += \
     main.cpp \
     loginwindow.cpp \
     rtcard.cpp \
+    setupinstructiondialog.cpp \
     subnetcard.cpp \
     vpccard.cpp \
     vpccreationdialog.cpp \
@@ -23,6 +24,7 @@ HEADERS += \
     infrastructurecoordinator.h \
     loginwindow.h \
     rtcard.h \
+    setupinstructiondialog.h \
     subnetcard.h \
     vpccard.h \
     vpccreationdialog.h \
