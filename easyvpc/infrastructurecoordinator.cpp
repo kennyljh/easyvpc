@@ -44,7 +44,7 @@ void InfrastructureCoordinator::coordinateVPCCreation(
     for (const auto &rt : RTs){
         RTInfos.append(rt);
     }
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this]() {
         emit coordinatorStageChanged("Starting VPC creation... %p%", 0);
     });
 
@@ -55,12 +55,12 @@ void InfrastructureCoordinator::coordinateSubnetsCreation(QString vpcId){
 
     vpcID = vpcId;
     qDebug() << "VPC created: " + vpcID;
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this]() {
         emit coordinatorStageChanged("VPC created... %p%", 30);
     });
 
     subnetIndex = 0;
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this]() {
         emit coordinatorStageChanged("Starting Subnet creation... %p%", 30);
     });
     createNextSubnet();
@@ -71,7 +71,7 @@ void InfrastructureCoordinator::createNextSubnet(){
     if (subnetIndex >= subnetInfos.size()){
         qDebug() << "All subnets created";
 
-        QMetaObject::invokeMethod(this, []() {
+        QMetaObject::invokeMethod(this, [this]() {
             emit coordinatorStageChanged("All Subnets created... %p%", 70);
             emit coordinatorStageChanged("Creating Internet Gateway... %p%", 70);
         });
@@ -82,7 +82,7 @@ void InfrastructureCoordinator::createNextSubnet(){
 
     auto subnet = subnetInfos[subnetIndex];
 
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this, subnet]() {
         emit coordinatorStageChanged("Creating Subnet " + subnet.name + "... %p%", 30);
     });
 
@@ -108,7 +108,7 @@ void InfrastructureCoordinator::onIGWCreated(const QString &igwId){
 
     igwID = igwId;
     qDebug() << "IGW created: " + igwID;
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this]() {
         emit coordinatorStageChanged("Interet Gateway created... %p%", 85);
     });
 
@@ -118,7 +118,7 @@ void InfrastructureCoordinator::onIGWCreated(const QString &igwId){
 void InfrastructureCoordinator::coordinateRTCreation(){
 
     rtIndex = 0;
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this]() {
         emit coordinatorStageChanged("Creating Route Tables... %p%", 85);
     });
     createNextRT();
@@ -129,7 +129,7 @@ void InfrastructureCoordinator::createNextRT(){
     if (rtIndex >= RTInfos.size()){
 
         qDebug() << "VPC infrastructure completed";
-        QMetaObject::invokeMethod(this, []() {
+        QMetaObject::invokeMethod(this, [this]() {
             emit vpcInfrastructureFinished("Created VPC " + vpcName + " " + vpcID);
             emit coordinatorStageChanged("VPC " + vpcName + " is ready %p%", 100);
         });
@@ -144,7 +144,7 @@ void InfrastructureCoordinator::createNextRT(){
         subnetIDs.append(subnetNameToID[subnetName]);
     }
 
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this, rt]() {
         emit coordinatorStageChanged("Creating Route Table " + rt.name + "... %p%", 85);
     });
 
@@ -170,7 +170,7 @@ void InfrastructureCoordinator::coordinateVPCInfrastructureDeletion(const QStrin
         return;
     }
     qDebug() << "Coordinating VPC deletion for: " + vpcID;
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this, vpcID]() {
         emit coordinatorStageChanged("Starting VPC" + vpcID + " deletion... %p%", 0);
     });
 
@@ -179,7 +179,7 @@ void InfrastructureCoordinator::coordinateVPCInfrastructureDeletion(const QStrin
 
 void InfrastructureCoordinator::coordinateIGWDeletion(const QString &vpcID){
 
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this]() {
         emit coordinatorStageChanged("Route tables deleted... %p%", 30);
         emit coordinatorStageChanged("Starting Internet Gateway deletion... %p%", 30);
     });
@@ -188,7 +188,7 @@ void InfrastructureCoordinator::coordinateIGWDeletion(const QString &vpcID){
 
 void InfrastructureCoordinator::coordinateSubnetsDeletion(const QString &vpcID){
 
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this]() {
         emit coordinatorStageChanged("Internet Gateway deleted... %p%", 60);
         emit coordinatorStageChanged("Starting Subnets deletion... %p%", 60);
     });
@@ -198,7 +198,7 @@ void InfrastructureCoordinator::coordinateSubnetsDeletion(const QString &vpcID){
 
 void InfrastructureCoordinator::coordinateVPCDeletion(const QString &vpcID){
 
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this]() {
         emit coordinatorStageChanged("Subnets deleted... %p%", 90);
         emit coordinatorStageChanged("Starting VPC deletion... %p%", 90);
     });
@@ -208,7 +208,7 @@ void InfrastructureCoordinator::coordinateVPCDeletion(const QString &vpcID){
 
 void InfrastructureCoordinator::coordinateVPCDeletionCompleted(const QString &vpcID){
 
-    QMetaObject::invokeMethod(this, []() {
+    QMetaObject::invokeMethod(this, [this, vpcID]() {
         emit coordinatorStageChanged("VPC " + vpcID + " successfully deleted %p%", 100);
         emit vpcInfrastructureDeleted("VPC " + vpcID + " successfully deleted");
     });
