@@ -44,7 +44,10 @@ void InfrastructureCoordinator::coordinateVPCCreation(
     for (const auto &rt : RTs){
         RTInfos.append(rt);
     }
-    emit coordinatorStageChanged("Starting VPC creation... %p%", 0);
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("Starting VPC creation... %p%", 0);
+    });
+
     AWSManager::instance().createVPCAsync(vpc, CIDR);
 }
 
@@ -52,10 +55,14 @@ void InfrastructureCoordinator::coordinateSubnetsCreation(QString vpcId){
 
     vpcID = vpcId;
     qDebug() << "VPC created: " + vpcID;
-    emit coordinatorStageChanged("VPC created... %p%", 30);
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("VPC created... %p%", 30);
+    });
 
     subnetIndex = 0;
-    emit coordinatorStageChanged("Starting Subnet creation... %p%", 30);
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("Starting Subnet creation... %p%", 30);
+    });
     createNextSubnet();
 }
 
@@ -64,8 +71,10 @@ void InfrastructureCoordinator::createNextSubnet(){
     if (subnetIndex >= subnetInfos.size()){
         qDebug() << "All subnets created";
 
-        emit coordinatorStageChanged("All Subnets created... %p%", 70);
-        emit coordinatorStageChanged("Creating Internet Gateway... %p%", 70);
+        QMetaObject::invokeMethod(this, []() {
+            emit coordinatorStageChanged("All Subnets created... %p%", 70);
+            emit coordinatorStageChanged("Creating Internet Gateway... %p%", 70);
+        });
 
         AWSManager::instance().createIGWAsync(vpcID, igwName);
         return;
@@ -73,7 +82,9 @@ void InfrastructureCoordinator::createNextSubnet(){
 
     auto subnet = subnetInfos[subnetIndex];
 
-    emit coordinatorStageChanged("Creating Subnet " + subnet.name + "... %p%", 30);
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("Creating Subnet " + subnet.name + "... %p%", 30);
+    });
 
     AWSManager::instance().createSubnetAsync(
         vpcID,
@@ -97,7 +108,9 @@ void InfrastructureCoordinator::onIGWCreated(const QString &igwId){
 
     igwID = igwId;
     qDebug() << "IGW created: " + igwID;
-    emit coordinatorStageChanged("Interet Gateway created... %p%", 85);
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("Interet Gateway created... %p%", 85);
+    });
 
     coordinateRTCreation();
 }
@@ -105,7 +118,9 @@ void InfrastructureCoordinator::onIGWCreated(const QString &igwId){
 void InfrastructureCoordinator::coordinateRTCreation(){
 
     rtIndex = 0;
-    emit coordinatorStageChanged("Creating Route Tables... %p%", 85);
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("Creating Route Tables... %p%", 85);
+    });
     createNextRT();
 }
 
@@ -114,8 +129,10 @@ void InfrastructureCoordinator::createNextRT(){
     if (rtIndex >= RTInfos.size()){
 
         qDebug() << "VPC infrastructure completed";
-        emit vpcInfrastructureFinished("Created VPC " + vpcName + " " + vpcID);
-        emit coordinatorStageChanged("VPC " + vpcName + " is ready %p%", 100);
+        QMetaObject::invokeMethod(this, []() {
+            emit vpcInfrastructureFinished("Created VPC " + vpcName + " " + vpcID);
+            emit coordinatorStageChanged("VPC " + vpcName + " is ready %p%", 100);
+        });
         return;
     }
 
@@ -127,7 +144,9 @@ void InfrastructureCoordinator::createNextRT(){
         subnetIDs.append(subnetNameToID[subnetName]);
     }
 
-    emit coordinatorStageChanged("Creating Route Table " + rt.name + "... %p%", 85);
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("Creating Route Table " + rt.name + "... %p%", 85);
+    });
 
     AWSManager::instance().createRTAsync(
         vpcID,
@@ -151,33 +170,46 @@ void InfrastructureCoordinator::coordinateVPCInfrastructureDeletion(const QStrin
         return;
     }
     qDebug() << "Coordinating VPC deletion for: " + vpcID;
-    emit coordinatorStageChanged("Starting VPC" + vpcID + " deletion... %p%", 0);
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("Starting VPC" + vpcID + " deletion... %p%", 0);
+    });
+
     AWSManager::instance().deleteRTsByVPCIdAsync(vpcID);
 }
 
 void InfrastructureCoordinator::coordinateIGWDeletion(const QString &vpcID){
 
-    emit coordinatorStageChanged("Route tables deleted... %p%", 30);
-    emit coordinatorStageChanged("Starting Internet Gateway deletion... %p%", 30);
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("Route tables deleted... %p%", 30);
+        emit coordinatorStageChanged("Starting Internet Gateway deletion... %p%", 30);
+    });
     AWSManager::instance().deleteIGWByVPCIdAsync(vpcID);
 }
 
 void InfrastructureCoordinator::coordinateSubnetsDeletion(const QString &vpcID){
 
-    emit coordinatorStageChanged("Internet Gateway deleted... %p%", 60);
-    emit coordinatorStageChanged("Starting Subnets deletion... %p%", 60);
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("Internet Gateway deleted... %p%", 60);
+        emit coordinatorStageChanged("Starting Subnets deletion... %p%", 60);
+    });
+
     AWSManager::instance().deleteSubnetsByVPCIdAsync(vpcID);
 }
 
 void InfrastructureCoordinator::coordinateVPCDeletion(const QString &vpcID){
 
-    emit coordinatorStageChanged("Subnets deleted... %p%", 90);
-    emit coordinatorStageChanged("Starting VPC deletion... %p%", 90);
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("Subnets deleted... %p%", 90);
+        emit coordinatorStageChanged("Starting VPC deletion... %p%", 90);
+    });
+
     AWSManager::instance().deleteVPCByVPCIdAsync(vpcID);
 }
 
 void InfrastructureCoordinator::coordinateVPCDeletionCompleted(const QString &vpcID){
 
-    emit coordinatorStageChanged("VPC " + vpcID + " successfully deleted %p%", 100);
-    emit vpcInfrastructureDeleted("VPC " + vpcID + " successfully deleted");
+    QMetaObject::invokeMethod(this, []() {
+        emit coordinatorStageChanged("VPC " + vpcID + " successfully deleted %p%", 100);
+        emit vpcInfrastructureDeleted("VPC " + vpcID + " successfully deleted");
+    });
 }

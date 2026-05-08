@@ -51,6 +51,7 @@ VPCCard::VPCCard(const QString &name, const QString &id,
             connect(minimizeBtn, &QPushButton::clicked, this, &VPCCard::vpcMinimizeTriggered);
             minimizeBtn->hide();
             deleteBtn = new QPushButton("Delete", vpcTitleFrame);
+            deleteBtn->hide();
             connect(deleteBtn, &QPushButton::clicked,
                         this, &VPCCard::deleteVPCButtonClicked);
         vpcTitleLayout->addWidget(vpcName);
@@ -347,6 +348,7 @@ void VPCCard::vpcExpandTriggered(){
 
     expandBtn->hide();
     minimizeBtn->show();
+    deleteBtn->show();
 
     // fill up with placeholder frame first
     expandCard();
@@ -361,6 +363,7 @@ void VPCCard::vpcMinimizeTriggered(){
 
     minimizeBtn->hide();
     expandBtn->show();
+    deleteBtn->hide();
 
     for (int i = vpcFrameLayout->count() - 1; i >= 0; i--){
 

@@ -60,11 +60,11 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
                 subnetIPv4CIDREdt = new QLineEdit(subnetsFrame);
                 subnetIPv4CIDREdt->setPlaceholderText("10.0.1.0/24");
 
-                subnetBundle *subnet = new subnetBundle();
-                subnet->name = subnetNameEdt;
-                subnet->zone = regionsCBox;
-                subnet->ipv4 = subnetIPv4CIDREdt;
-                subnetBundles.push_back(*subnet);
+                subnetBundle subnet;
+                subnet.name = subnetNameEdt;
+                subnet.zone = regionsCBox;
+                subnet.ipv4 = subnetIPv4CIDREdt;
+                subnetBundles.push_back(subnet);
 
                 addSubnetBtn = new QPushButton("Add", subnetsFrame);
                 connect(addSubnetBtn, &QPushButton::clicked,
@@ -102,10 +102,10 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
                 subnetsLWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
                 subnetsLWidget->setSelectionMode(QAbstractItemView::MultiSelection);
 
-                RTBundle *RT = new RTBundle();
-                RT->name = RTNameEdt;
-                RT->subnets = subnetsLWidget;
-                RTBundles.push_back(*RT);
+                RTBundle RT;
+                RT.name = RTNameEdt;
+                RT.subnets = subnetsLWidget;
+                RTBundles.push_back(RT);
 
                 addRTBtn = new QPushButton("Add", RTsFrame);
                 connect(addRTBtn, &QPushButton::clicked,
@@ -143,27 +143,31 @@ void VPCCreationDialog::createVPCRequest(){
     QString vpcName = vpcNameEdt->text();
     QString vpcCIDR = vpcIPv4CIDREdt->text();
 
+    // clear old data, otherwise trigger bugs
+    subnetInfos.clear();
+    RTInfos.clear();
+
     for (const auto &subnetBundle : subnetBundles){
 
-        subnetInfo *info = new subnetInfo;
-        info->name = subnetBundle.name->text();
-        info->zone = subnetBundle.zone->currentText();
-        info->ipv4 = subnetBundle.ipv4->text();
-        if (info->name.isEmpty() || info->zone.isEmpty() || info->ipv4.isEmpty()){
+        subnetInfo info;
+        info.name = subnetBundle.name->text();
+        info.zone = subnetBundle.zone->currentText();
+        info.ipv4 = subnetBundle.ipv4->text();
+        if (info.name.isEmpty() || info.zone.isEmpty() || info.ipv4.isEmpty()){
             qDebug() << "Found subnet with incomplete info";
             continue;
         }
-        subnetInfos.append(*info);
-        qDebug() << "Found subnet bundle: " + info->name + " " + info->zone + " " + info->ipv4;
+        subnetInfos.append(info);
+        qDebug() << "Found subnet bundle: " + info.name + " " + info.zone + " " + info.ipv4;
     }
 
     QString igwName = igwEdt->text();
 
     for (const auto &RTBundle : RTBundles){
 
-        RTInfo *info = new RTInfo;
-        info->name = RTBundle.name->text();
-        qDebug() << "Found RT: " + info->name;
+        RTInfo info;
+        info.name = RTBundle.name->text();
+        qDebug() << "Found RT: " + info.name;
         QList<QListWidgetItem*> selected = RTBundle.subnets->selectedItems();
         QStringList list;
         for (const auto &item : selected){
@@ -177,14 +181,14 @@ void VPCCreationDialog::createVPCRequest(){
                 continue;
             }
             list.append(item->text());
-            qDebug() << "Found subnet: " + item->text() + " for " + info->name;
+            qDebug() << "Found subnet: " + item->text() + " for " + info.name;
         }
-        if (info->name.isEmpty()){
+        if (info.name.isEmpty()){
             qDebug() << "Found route table with incomplete info";
             continue;
         }
-        info->subnets = list;
-        RTInfos.append(*info);
+        info.subnets = list;
+        RTInfos.append(info);
     }
 
     emit VPCCreationRequested(

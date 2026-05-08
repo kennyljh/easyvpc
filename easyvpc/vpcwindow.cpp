@@ -166,7 +166,6 @@ void VPCWindow::regionChangeTriggered(const QString &region){
     AWSManager::instance().setSelectedRegion(region);
     statusBar()->showMessage("Changing region to " + region);
     AWSManager::instance().getVPCsAsync();
-    AWSManager::instance().vpcIDCache.clear();
 }
 
 void VPCWindow::coordinatorUpdated(const QString &msg, const int &val){

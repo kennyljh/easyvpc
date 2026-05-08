@@ -88,6 +88,9 @@ void AWSManager::getRegionsAsync(){
 
 void AWSManager::getVPCsAsync(){
 
+    vpcIDCache.clear();
+    qDebug() << "Clearing VPC cache";
+
     QString profile = selectedProfile;
     QString region = selectedRegion;
 
@@ -746,6 +749,8 @@ void AWSManager::deleteRTsByVPCIdAsync(QString vpcID){
     QString profile = selectedProfile;
     QString region = selectedRegion;
 
+    auto temp = vpcIDCache[vpcID].routeTables;
+
     QtConcurrent::run([this, profile, region, vpcID]() {
 
         Aws::Client::ClientConfiguration config;
@@ -774,18 +779,43 @@ void AWSManager::deleteRTsByVPCIdAsync(QString vpcID){
 
                 Aws::EC2::Model::DisassociateRouteTableRequest disReq;
                 disReq.SetAssociationId(assoc.GetRouteTableAssociationId());
-                ec2.DisassociateRouteTable(disReq);
+                auto outcome = ec2.DisassociateRouteTable(disReq);
+
+                if (!outcome.IsSuccess()){
+
+                    QString err = QString::fromStdString(
+                        outcome.GetError().GetMessage()
+                    );
+
+                    QMetaObject::invokeMethod(this, [this, err]() {
+                        emit apiError(err);
+                        return;
+                    });
+                }
             }
 
             // delete RT
             Aws::EC2::Model::DeleteRouteTableRequest delReq;
             delReq.SetRouteTableId(rtId);
-            ec2.DeleteRouteTable(delReq);
+            auto outcome = ec2.DeleteRouteTable(delReq);
+
+            if (!outcome.IsSuccess()){
+
+                QString err = QString::fromStdString(
+                    outcome.GetError().GetMessage()
+                );
+
+                QMetaObject::invokeMethod(this, [this, err]() {
+                    emit apiError(err);
+                    return;
+                });
+            }
 
             qDebug() << "Deleted RT: " + rtId;
         }
 
         QMetaObject::invokeMethod(this, [this, vpcID]() {
+            qDebug() << "RT deletion success";
             emit RTsDeletionCompleted(vpcID);
         });
     });
