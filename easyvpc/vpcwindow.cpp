@@ -60,14 +60,12 @@ VPCWindow::VPCWindow(QWidget *parent) : QMainWindow(parent){
             welcomeName->setFont(qfont);
             refreshBtn = new QPushButton("Refresh", myVPCBarFrame);
             connect(refreshBtn, &QPushButton::clicked, this, &VPCWindow::refreshButtonClicked);
-            expandAllBtn = new QPushButton("Expand All", myVPCBarFrame);
             createBtn = new QPushButton("Create", myVPCBarFrame);
             connect(createBtn, &QPushButton::clicked,
                         this, &VPCWindow::createVPCButtonClicked);
         myVPCBarLayout->addWidget(welcomeName);
         myVPCBarLayout->addStretch();
         myVPCBarLayout->addWidget(refreshBtn);
-        myVPCBarLayout->addWidget(expandAllBtn);
         myVPCBarLayout->addWidget(createBtn);
 
         myVPCScrollArea = new QScrollArea(centralWindow);

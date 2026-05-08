@@ -35,7 +35,6 @@ class VPCWindow : public QMainWindow{
         QHBoxLayout *myVPCBarLayout;
         QLabel *welcomeName;
         QPushButton *refreshBtn;
-        QPushButton *expandAllBtn;
         QPushButton *createBtn;
 
         QScrollArea *myVPCScrollArea;

@@ -54,6 +54,8 @@ class InfrastructureCoordinator : public QObject{
 
         void onRTCreated(const QString &rtID);
 
+        void coordinateVPCDeletion(const QString &vpcID);
+
     signals:
         void vpcInfrastructureFinished(const QString &msg);
 

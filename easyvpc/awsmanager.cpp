@@ -18,6 +18,12 @@
 #include <aws/ec2/model/CreateRouteTableRequest.h>
 #include <aws/ec2/model/CreateRouteRequest.h>
 #include <aws/ec2/model/AssociateRouteTableRequest.h>
+#include <aws/ec2/model/DisassociateRouteTableRequest.h>
+#include <aws/ec2/model/DeleteRouteTableRequest.h>
+#include <aws/ec2/model/DetachInternetGatewayRequest.h>
+#include <aws/ec2/model/DeleteInternetGatewayRequest.h>
+#include <aws/ec2/model/DeleteSubnetRequest.h>
+#include <aws/ec2/model/DeleteVpcRequest.h>
 
 AWSManager::AWSManager(QObject *parent) : QObject(parent) {}
 
@@ -735,6 +741,164 @@ void AWSManager::createRTAsync(QString vpcID,
     });
 }
 
+void AWSManager::deleteRTsByVPCIdAsync(QString vpcID){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+
+    QtConcurrent::run([this, profile, region, vpcID]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        for (const auto &rt : vpcIDCache[vpcID].routeTables){
+
+            auto rtId = rt.GetRouteTableId();
+
+            bool isMain = false;
+            for (const auto &assoc : rt.GetAssociations()){
+
+                if (assoc.GetMain()){
+
+                    isMain = true;
+                    break;
+                }
+            }
+            if (isMain) continue;
+
+            // disassociate associations
+            for (const auto &assoc : rt.GetAssociations()){
+
+                Aws::EC2::Model::DisassociateRouteTableRequest disReq;
+                disReq.SetAssociationId(assoc.GetRouteTableAssociationId());
+                ec2.DisassociateRouteTable(disReq);
+            }
+
+            // delete RT
+            Aws::EC2::Model::DeleteRouteTableRequest delReq;
+            delReq.SetRouteTableId(rtId);
+            ec2.DeleteRouteTable(delReq);
+        }
+
+        QMetaObject::invokeMethod(this, [this, vpcID]() {
+            emit RTsDeletionCompleted(vpcID);
+        });
+    });
+}
+
+void AWSManager::deleteIGWByVPCIdAsync(QString vpcID){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+
+    QtConcurrent::run([this, profile, region, vpcID]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        for (const auto &igw : vpcIDCache[vpcID].igw){
+
+            auto igwId = igw.GetInternetGatewayId();
+
+            // detach igw from vpc
+            Aws::EC2::Model::DetachInternetGatewayRequest detachReq;
+            detachReq.SetInternetGatewayId(igwId);
+            detachReq.SetVpcId(vpcID.toStdString());
+
+            ec2.DetachInternetGateway(detachReq);
+
+            // delete igw
+            Aws::EC2::Model::DeleteInternetGatewayRequest delReq;
+            delReq.SetInternetGatewayId(igwId);
+
+            ec2.DeleteInternetGateway(delReq);
+        }
+
+        QMetaObject::invokeMethod(this, [this, vpcID]() {
+            emit IGWDeletionCompleted(vpcID);
+        });
+    });
+}
+
+void AWSManager::deleteSubnetsByVPCIdAsync(QString vpcID){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+
+    QtConcurrent::run([this, profile, region, vpcID]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        for (const auto &subnet : vpcIDCache[vpcID].subnets){
+
+            Aws::EC2::Model::DeleteSubnetRequest req;
+            req.SetSubnetId(subnet.GetSubnetId());
+
+            auto outcome = ec2.DeleteSubnet(req);
+
+            if (!outcome.IsSuccess()){
+
+                QString err = QString::fromStdString(
+                    outcome.GetError().GetMessage()
+                );
+
+                QMetaObject::invokeMethod(this, [this, err]() {
+                    emit apiError(err);
+                });
+            }
+        }
+
+        QMetaObject::invokeMethod(this, [this, vpcID]() {
+            emit SubnetsDeletionCompleted(vpcID);
+        });
+    });
+}
+
+void AWSManager::deleteVPCByVPCIdAsync(QString vpcID){
+
+    QString profile = selectedProfile;
+    QString region = selectedRegion;
+
+    QtConcurrent::run([this, profile, region, vpcID]() {
+
+        Aws::Client::ClientConfiguration config;
+        config.region = region.toStdString();
+        config.profileName = profile.toStdString();
+
+        Aws::EC2::EC2Client ec2(config);
+
+        Aws::EC2::Model::DeleteVpcRequest req;
+        req.SetVpcId(vpcID.toStdString());
+
+        auto outcome = ec2.DeleteVpc(req);
+
+        if (!outcome.IsSuccess()){
+
+            QString err = QString::fromStdString(
+                outcome.GetError().GetMessage()
+            );
+
+            QMetaObject::invokeMethod(this, [this, err]() {
+                emit apiError(err);
+            });
+            return;
+        }
+
+        QMetaObject::invokeMethod(this, [this, vpcID]() {
+            emit VPCDeletionCompleted(vpcID);
+        });
+    });
+}
 
 
 

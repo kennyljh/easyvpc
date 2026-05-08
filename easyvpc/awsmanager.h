@@ -139,6 +139,15 @@ class AWSManager : public QObject {
             QStringList subnetIDs
         );
 
+        void deleteRTsByVPCIdAsync(QString vpcID);
+
+        void deleteIGWByVPCIdAsync(QString vpcID);
+
+        void deleteSubnetsByVPCIdAsync(QString vpcID);
+
+        void deleteVPCByVPCIdAsync(QString vpcID);
+
+
     signals:
         /**
          * @brief regionsReady - signals when list of regions retrieved
@@ -215,6 +224,14 @@ class AWSManager : public QObject {
         void igwCreated(const QString &igwID);
 
         void routeTableCreated(const QString &rtID);
+
+        void RTsDeletionCompleted(const QString &vpcID);
+
+        void IGWDeletionCompleted(const QString &vpcID);
+
+        void SubnetsDeletionCompleted(const QString &vpcID);
+
+        void VPCDeletionCompleted(const QString &vpcID);
 
     private:
         explicit AWSManager(QObject *parent = nullptr);
