@@ -108,6 +108,8 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
                 RTBundles.push_back(*RT);
 
                 addRTBtn = new QPushButton("Add", RTsFrame);
+                connect(addRTBtn, &QPushButton::clicked,
+                            this, &VPCCreationDialog::addRTFrame);
             RTsLayout->addWidget(RTNameLabel);
             RTsLayout->addWidget(RTNameEdt);
             RTsLayout->addWidget(refreshSubnetsBtn);
@@ -165,8 +167,21 @@ void VPCCreationDialog::createVPCRequest(){
         QList<QListWidgetItem*> selected = RTBundle.subnets->selectedItems();
         QStringList list;
         for (const auto &item : selected){
+
+            bool validSubnet = false;
+            for (const auto &subnet : subnetInfos){
+                if (subnet.name == item->text()) validSubnet = true;
+            }
+            if (!validSubnet){
+                qDebug() << "Invalid subnet name chosen for RT";
+                continue;
+            }
             list.append(item->text());
             qDebug() << "Found subnet: " + item->text() + " for " + info->name;
+        }
+        if (info->name.isEmpty()){
+            qDebug() << "Found route table with incomplete info";
+            continue;
         }
         info->subnets = list;
         RTInfos.append(*info);
@@ -202,6 +217,7 @@ void VPCCreationDialog::addSubnetFrame(){
     subnetNameEdt->setPlaceholderText("my-subnet-01");
     QLabel *AZsLabel = new QLabel("Availability Zones", subnetsFrame);
     QComboBox *regionsCBox = new QComboBox(subnetsFrame);
+    for (const auto &zone : AZones) regionsCBox->addItem(zone);
     QLabel *subnetIPv4CIDRLabel = new QLabel("Subnet IPv4 CIDR", subnetsFrame);
     QLineEdit *subnetIPv4CIDREdt = new QLineEdit(subnetsFrame);
     subnetIPv4CIDREdt->setPlaceholderText("10.0.1.0/24");
@@ -216,7 +232,7 @@ void VPCCreationDialog::addSubnetFrame(){
     connect(addSubnetBtn, &QPushButton::clicked,
                 this, &VPCCreationDialog::addSubnetFrame);
 
-    subnetsLayout->addSpacing(10);
+    subnetsLayout->addSpacing(15);
     subnetsLayout->addWidget(subnetNameLabel);
     subnetsLayout->addWidget(subnetNameEdt);
     subnetsLayout->addWidget(AZsLabel);
@@ -224,6 +240,43 @@ void VPCCreationDialog::addSubnetFrame(){
     subnetsLayout->addWidget(subnetIPv4CIDRLabel);
     subnetsLayout->addWidget(subnetIPv4CIDREdt);
     subnetsLayout->addWidget(addSubnetBtn);
+}
 
+void VPCCreationDialog::addRTFrame(){
 
+    // removing add button
+    QLayoutItem *item = RTsLayout->takeAt(RTsLayout->count() - 1);
+    if (item->widget()) delete item->widget();
+    delete item;
+
+    QLabel *RTNameLabel = new QLabel("Route Table Name", RTsFrame);
+    QLineEdit *RTNameEdt = new QLineEdit(RTsFrame);
+    RTNameEdt->setPlaceholderText("my-rt-01");
+    QPushButton *refreshSubnetsBtn = new QPushButton("Refresh Subnets");
+    QListWidget *subnetsLWidget = new QListWidget(RTsFrame);
+    connect(refreshSubnetsBtn, &QPushButton::clicked,
+                this, [this, subnetsLWidget](){
+                    subnetsLWidget->clear();
+                    for (const auto &subnetBundle : subnetBundles){
+                        subnetsLWidget->addItem(subnetBundle.name->text());
+                    }
+    });
+    subnetsLWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    subnetsLWidget->setSelectionMode(QAbstractItemView::MultiSelection);
+
+    RTBundle *RT = new RTBundle();
+    RT->name = RTNameEdt;
+    RT->subnets = subnetsLWidget;
+    RTBundles.push_back(*RT);
+
+    QPushButton *addRTBtn = new QPushButton("Add", RTsFrame);
+    connect(addRTBtn, &QPushButton::clicked,
+                this, &VPCCreationDialog::addRTFrame);
+
+    RTsLayout->addSpacing(15);
+    RTsLayout->addWidget(RTNameLabel);
+    RTsLayout->addWidget(RTNameEdt);
+    RTsLayout->addWidget(refreshSubnetsBtn);
+    RTsLayout->addWidget(subnetsLWidget);
+    RTsLayout->addWidget(addRTBtn);
 }

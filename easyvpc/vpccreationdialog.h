@@ -97,7 +97,7 @@ class VPCCreationDialog : public QDialog{
 
         void addSubnetFrame();
 
-        //void addRTFrame();
+        void addRTFrame();
 
     signals:
         void VPCCreationRequested(

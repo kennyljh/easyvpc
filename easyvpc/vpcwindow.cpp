@@ -155,12 +155,12 @@ void VPCWindow::createVPCButtonClicked(){
                 this, &VPCWindow::VPCCreationDataDebug);
 
     // connect to coordinator
-    connect(dialog, &VPCCreationDialog::VPCCreationRequested,
-                coordinator, &InfrastructureCoordinator::coordinateVPCCreation);
+    // connect(dialog, &VPCCreationDialog::VPCCreationRequested,
+    //             coordinator, &InfrastructureCoordinator::coordinateVPCCreation);
 
-    // inform vpc infrastructure done building
-    connect(coordinator, &InfrastructureCoordinator::vpcInfrastructureFinished,
-                this, &VPCWindow::setStatusBar);
+    // // inform vpc infrastructure done building
+    // connect(coordinator, &InfrastructureCoordinator::vpcInfrastructureFinished,
+    //             this, &VPCWindow::setStatusBar);
 
     dialog->exec();
 }
