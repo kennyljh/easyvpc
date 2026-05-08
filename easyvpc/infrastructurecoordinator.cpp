@@ -146,6 +146,10 @@ void InfrastructureCoordinator::onRTCreated(const QString &rtID){
 
 void InfrastructureCoordinator::coordinateVPCInfrastructureDeletion(const QString &vpcID){
 
+    if (!AWSManager::instance().vpcIDCache.contains(vpcID)){
+        qDebug() << "Cannot deleting non-existing vpc: " + vpcID;
+        return;
+    }
     qDebug() << "Coordinating VPC deletion for: " + vpcID;
     emit coordinatorStageChanged("Starting VPC" + vpcID + " deletion... %p%", 0);
     AWSManager::instance().deleteRTsByVPCIdAsync(vpcID);

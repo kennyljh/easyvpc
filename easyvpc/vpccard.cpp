@@ -387,18 +387,3 @@ void VPCCard::deleteVPCButtonClicked(){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

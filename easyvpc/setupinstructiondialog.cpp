@@ -215,18 +215,6 @@ SetupInstructionDialog::SetupInstructionDialog(QWidget *parent)
         AWS SSO sessions expire periodically.
         </p>
 
-        <p>
-        If authentication stops working, run:
-        </p>
-
-        <pre>
-        aws sso login --profile &lt;profile-name&gt;
-        </pre>
-
-        <p>
-        again to refresh your credentials.
-        </p>
-
         <hr>
 
         <h2>Helpful Links</h2>

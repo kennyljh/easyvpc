@@ -42,6 +42,7 @@ SubnetCard::SubnetCard(const QString &vpcid, const QString &name, const QString 
             subnetNameLabel = new QLabel(name, subnetTopFrame);
             subnetNameLabel->setFont(qfontB13);
             deleteSubnetBtn = new QPushButton("Delete", subnetTopFrame);
+            deleteSubnetBtn->hide();
         subnetTopLayout->addWidget(subnetNameLabel);
         subnetTopLayout->addStretch();
         subnetTopLayout->addWidget(deleteSubnetBtn);

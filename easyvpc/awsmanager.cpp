@@ -781,6 +781,8 @@ void AWSManager::deleteRTsByVPCIdAsync(QString vpcID){
             Aws::EC2::Model::DeleteRouteTableRequest delReq;
             delReq.SetRouteTableId(rtId);
             ec2.DeleteRouteTable(delReq);
+
+            qDebug() << "Deleted RT: " + rtId;
         }
 
         QMetaObject::invokeMethod(this, [this, vpcID]() {
@@ -818,6 +820,8 @@ void AWSManager::deleteIGWByVPCIdAsync(QString vpcID){
             delReq.SetInternetGatewayId(igwId);
 
             ec2.DeleteInternetGateway(delReq);
+
+            qDebug() << "Deleted IGW: " + igwId;
         }
 
         QMetaObject::invokeMethod(this, [this, vpcID]() {
@@ -856,6 +860,7 @@ void AWSManager::deleteSubnetsByVPCIdAsync(QString vpcID){
                     emit apiError(err);
                 });
             }
+            qDebug() << "Deleted subnet: " + subnet.GetSubnetId();
         }
 
         QMetaObject::invokeMethod(this, [this, vpcID]() {
@@ -893,6 +898,7 @@ void AWSManager::deleteVPCByVPCIdAsync(QString vpcID){
             });
             return;
         }
+        qDebug() << "Deleted VPC: " + vpcID;
 
         QMetaObject::invokeMethod(this, [this, vpcID]() {
             emit VPCDeletionCompleted(vpcID);
