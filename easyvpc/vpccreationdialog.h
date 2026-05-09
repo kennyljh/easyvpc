@@ -88,18 +88,44 @@ class VPCCreationDialog : public QDialog{
 
         QPushButton *createBtn;
 
+        /**
+         * @brief createVPCRequest - bundles all vpc related information
+         * into creation request
+         */
         void createVPCRequest();
 
     private slots:
         void subnetsRefreshButtonClicked();
 
+        /**
+         * @brief processZones - processes retrieved list availability zones
+         * for current region into frame
+         * @param zones
+         */
         void processZones(const std::vector<Aws::EC2::Model::AvailabilityZone> &zones);
 
+        /**
+         * @brief addSubnetFrame - appends another widget for subnet
+         * creation
+         */
         void addSubnetFrame();
 
+        /**
+         * @brief addRTFrame - appends another widget for RT
+         * creation
+         */
         void addRTFrame();
 
     signals:
+        /**
+         * @brief VPCCreationRequested - emits signal for VPC creation, includes
+         * all vpc related information
+         * @param vpcName
+         * @param vpcCIDR
+         * @param subnetInfos
+         * @param igwName
+         * @param RTInfos
+         */
         void VPCCreationRequested(
             QString &vpcName,
             QString &vpcCIDR,
