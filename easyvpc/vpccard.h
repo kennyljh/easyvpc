@@ -128,6 +128,9 @@ class VPCCard : public QFrame{
          * triggered
          */
         void deleteVPCButtonClicked();
+
+    signals:
+        void vpcDeletionRequest(const QString &vpcID);
 };
 
 #endif // VPCCARD_H

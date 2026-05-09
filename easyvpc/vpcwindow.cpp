@@ -174,6 +174,16 @@ void VPCWindow::coordinatorUpdated(const QString &msg, const int &val){
     taskProgressBar->setValue(val);
 }
 
+void VPCWindow::vpcDeletionRequested(const QString &vpcID){
+
+    InfrastructureCoordinator *coordinator = new InfrastructureCoordinator(this);
+    coordinator->coordinateVPCDeletion(vpcID);
+
+    // update progress bar on provisioning stage
+    connect(coordinator, &InfrastructureCoordinator::coordinatorStageChanged,
+                this, &VPCWindow::coordinatorUpdated);
+}
+
 void VPCWindow::VPCCreationDataDebug(
             QString &vpcName,
             QString &vpcCIDR,

@@ -127,12 +127,26 @@ class InfrastructureCoordinator : public QObject{
         void coordinateVPCDeletionCompleted(const QString &vpcID);
 
     signals:
+        /**
+         * @brief vpcInfrastructureFinished - signals when vpc insfrastructure
+         * provisioning is complete
+         * @param msg
+         */
         void vpcInfrastructureFinished(const QString &msg);
 
-        void coordinatorError(const QString &err);
-
+        /**
+         * @brief coordinatorStageChanged - signals when coordinator stage
+         * has changed
+         * @param msg
+         * @param val
+         */
         void coordinatorStageChanged(const QString &msg, const int &val);
 
+        /**
+         * @brief vpcInfrastructureDeleted - signals when vpc insfrastructure
+         * deletion is complete
+         * @param msg
+         */
         void vpcInfrastructureDeleted(const QString &msg);
 };
 

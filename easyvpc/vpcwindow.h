@@ -80,6 +80,8 @@ class VPCWindow : public QMainWindow{
          */
         void coordinatorUpdated(const QString &msg, const int &val);
 
+        void vpcDeletionRequested(const QString &vpcID);
+
         /**
          * @brief VPCCreationDataDebug - to debug vpc creation request
          * information retrieved from dialog

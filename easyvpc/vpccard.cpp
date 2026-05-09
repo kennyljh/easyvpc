@@ -383,8 +383,7 @@ void VPCCard::vpcMinimizeTriggered(){
 
 void VPCCard::deleteVPCButtonClicked(){
 
-    InfrastructureCoordinator *coordinator = new InfrastructureCoordinator(this);
-    coordinator->coordinateVPCInfrastructureDeletion(vpcID);
+    emit vpcDeletionRequest(vpcID);
 }
 
 

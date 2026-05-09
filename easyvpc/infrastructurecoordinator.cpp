@@ -182,10 +182,10 @@ void InfrastructureCoordinator::coordinateVPCInfrastructureDeletion(const QStrin
         qDebug() << "Cannot deleting non-existing vpc: " + vpcID;
         return;
     }
-    qDebug() << "Coordinating VPC deletion for: " + vpcID;
 
     QMetaObject::invokeMethod(this, [this, vpcID]() {
-        emit coordinatorStageChanged("Starting VPC" + vpcID + " deletion... %p%", 0);
+        qDebug() << "Coordinating VPC deletion for: " + vpcID;
+        emit coordinatorStageChanged("Starting VPC " + vpcID + " deletion... %p%", 0);
     });
 
     AWSManager::instance().deleteRTsByVPCIdAsync(vpcID);
