@@ -28,22 +28,19 @@ InfrastructureCoordinator::InfrastructureCoordinator(QObject *parent)
                 this, &InfrastructureCoordinator::coordinateVPCDeletionCompleted);
 }
 
-void InfrastructureCoordinator::coordinateVPCCreation(
-    QString &vpc,
-    QString &CIDR,
-    const QList<VPCCreationDialog::subnetInfo> &subnets,
-    QString &igw,
-    const QList<VPCCreationDialog::RTInfo> &RTs){
+void InfrastructureCoordinator::coordinateVPCCreation(QString &vpc,
+                                                        QString &CIDR,
+                                                        const QList<VPCCreationDialog::subnetInfo> &subnets,
+                                                        QString &igw,
+                                                        const QList<VPCCreationDialog::RTInfo> &RTs){
 
     vpcName = vpc;
     vpcCIDR = CIDR;
-    for (const auto &subnet : subnets){
-        subnetInfos.append(subnet);
-    }
+    for (const auto &subnet : subnets) subnetInfos.append(subnet);
+
     igwName = igw;
-    for (const auto &rt : RTs){
-        RTInfos.append(rt);
-    }
+    for (const auto &rt : RTs) RTInfos.append(rt);
+
     QMetaObject::invokeMethod(this, [this]() {
         emit coordinatorStageChanged("Starting VPC creation... %p%", 0);
     });
@@ -81,9 +78,11 @@ void InfrastructureCoordinator::createNextSubnet(){
     }
 
     auto subnet = subnetInfos[subnetIndex];
+    int index = subnetIndex;
+    int size = subnetInfos.size();
 
-    QMetaObject::invokeMethod(this, [this, subnet]() {
-        emit coordinatorStageChanged("Creating Subnet " + subnet.name + "... %p%", 30);
+    QMetaObject::invokeMethod(this, [this, subnet, index, size]() {
+        emit coordinatorStageChanged("Creating Subnet " + subnet.name + "... %p%", (30 + (index*(40/size))));
     });
 
     AWSManager::instance().createSubnetAsync(
@@ -101,6 +100,13 @@ void InfrastructureCoordinator::onSubnetCreated(const QString &subnetID,
     subnetNameToID[subnetName] = subnetID;
 
     subnetIndex++;
+
+    int index = subnetIndex;
+    int size = subnetInfos.size();
+    QMetaObject::invokeMethod(this, [this, subnetName, index, size]() {
+        emit coordinatorStageChanged("Created Subnet " + subnetName + " %p%", (30 + (index*(40/size))));
+    });
+
     createNextSubnet();
 }
 
@@ -140,12 +146,12 @@ void InfrastructureCoordinator::createNextRT(){
 
     QStringList subnetIDs;
 
-    for (const auto &subnetName : rt.subnets){
-        subnetIDs.append(subnetNameToID[subnetName]);
-    }
+    for (const auto &subnetName : rt.subnets) subnetIDs.append(subnetNameToID[subnetName]);
 
-    QMetaObject::invokeMethod(this, [this, rt]() {
-        emit coordinatorStageChanged("Creating Route Table " + rt.name + "... %p%", 85);
+    int index = rtIndex;
+    int size = RTInfos.size();
+    QMetaObject::invokeMethod(this, [this, rt, index, size]() {
+        emit coordinatorStageChanged("Creating Route Table " + rt.name + "... %p%", (85 + (index*(15/size))));
     });
 
     AWSManager::instance().createRTAsync(
@@ -160,6 +166,13 @@ void InfrastructureCoordinator::onRTCreated(const QString &rtID){
 
     qDebug() << "Created RT: " + rtID;
     rtIndex++;
+
+    int index = rtIndex;
+    int size = RTInfos.size();
+    QMetaObject::invokeMethod(this, [this, rtID, index, size]() {
+        emit coordinatorStageChanged("Created Route Table " + rtID + " %p%", (85 + (index*(15/size))));
+    });
+
     createNextRT();
 }
 
@@ -170,6 +183,7 @@ void InfrastructureCoordinator::coordinateVPCInfrastructureDeletion(const QStrin
         return;
     }
     qDebug() << "Coordinating VPC deletion for: " + vpcID;
+
     QMetaObject::invokeMethod(this, [this, vpcID]() {
         emit coordinatorStageChanged("Starting VPC" + vpcID + " deletion... %p%", 0);
     });
