@@ -57,6 +57,10 @@ class LoginWindow : public QMainWindow{
         void helpButtonClicked();
 
     signals:
+        /**
+         * @brief loginIsSuccessful - signals when aws sso is
+         * successful
+         */
         void loginIsSuccessful();
 };
 

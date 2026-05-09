@@ -134,14 +134,17 @@ void LoginWindow::getAWSProfiles(QStringList &profiles){
 
     for (const QString &key : keys){
 
-        qDebug() << "found profile: " << key;
+        qDebug() << "Found profile: " << key;
         if (key.startsWith("profile ")){
 
             QString profileName = key.section(".", 0, 0);
             profileName.remove("profile ");
             profileName = profileName.section('/', 0, 0);
-            qDebug() << "filered profile name: " << profileName;
-            if (!profiles.contains(profileName)) profiles.append(profileName);
+
+            if (!profiles.contains(profileName)) {
+                qDebug() << "Filtered profile name: " << profileName;
+                profiles.append(profileName);
+            }
         }
     }
 
@@ -149,17 +152,4 @@ void LoginWindow::getAWSProfiles(QStringList &profiles){
         if (!profiles.contains("default")) profiles.prepend("default");
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
