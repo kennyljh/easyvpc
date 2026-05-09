@@ -122,6 +122,9 @@ void VPCWindow::processVPCs(const std::vector<Aws::EC2::Model::Vpc> &vpcs){
         myVPCLayout->addWidget(card);
         GUIUtil util;
         util.applyWidgetFade(card, 300);
+
+        connect(card, &VPCCard::vpcDeletionRequest,
+                    this, &VPCWindow::vpcDeletionRequested);
     }
     statusBar()->showMessage("Found " + QString::number(vpcs.size()) + " VPCs");
 }
@@ -177,7 +180,7 @@ void VPCWindow::coordinatorUpdated(const QString &msg, const int &val){
 void VPCWindow::vpcDeletionRequested(const QString &vpcID){
 
     InfrastructureCoordinator *coordinator = new InfrastructureCoordinator(this);
-    coordinator->coordinateVPCDeletion(vpcID);
+    coordinator->coordinateVPCInfrastructureDeletion(vpcID);
 
     // update progress bar on provisioning stage
     connect(coordinator, &InfrastructureCoordinator::coordinatorStageChanged,

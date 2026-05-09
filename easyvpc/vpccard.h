@@ -130,6 +130,11 @@ class VPCCard : public QFrame{
         void deleteVPCButtonClicked();
 
     signals:
+        /**
+         * @brief vpcDeletionRequest - signals when vpc deletion
+         * for vpcID is requested
+         * @param vpcID
+         */
         void vpcDeletionRequest(const QString &vpcID);
 };
 

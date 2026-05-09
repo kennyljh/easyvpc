@@ -98,6 +98,7 @@ class InfrastructureCoordinator : public QObject{
          */
         void coordinateVPCInfrastructureDeletion(const QString &vpcID);
 
+    private slots:
         /**
          * @brief coordinateIGWDeletion - coordinates igw disassociation
          * and deletion

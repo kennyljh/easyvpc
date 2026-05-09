@@ -69,8 +69,7 @@ void InfrastructureCoordinator::createNextSubnet(){
         qDebug() << "All subnets created";
 
         QMetaObject::invokeMethod(this, [this]() {
-            emit coordinatorStageChanged("All Subnets created... %p%", 70);
-            emit coordinatorStageChanged("Creating Internet Gateway... %p%", 70);
+            emit coordinatorStageChanged("All Subnets created. Creating Internet Gateway... %p%", 70);
         });
 
         AWSManager::instance().createIGWAsync(vpcID, igwName);
@@ -186,7 +185,7 @@ void InfrastructureCoordinator::coordinateVPCInfrastructureDeletion(const QStrin
     QMetaObject::invokeMethod(this, [this, vpcID]() {
         qDebug() << "Coordinating VPC deletion for: " + vpcID;
         emit coordinatorStageChanged("Starting VPC " + vpcID + " deletion... %p%", 0);
-    });
+    }, Qt::QueuedConnection);
 
     AWSManager::instance().deleteRTsByVPCIdAsync(vpcID);
 }
