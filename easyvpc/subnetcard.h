@@ -61,11 +61,29 @@ class SubnetCard : public QFrame{
         QLabel *subnetACLsLabel;
 
     private slots:
-        void processEC2s(const QString &subnetId, const std::vector<Aws::EC2::Model::Reservation> &reservations);
+        /**
+         * @brief processEC2s - process EC2s into appropriate subnet widget
+         * @param subnetId
+         * @param reservations
+         */
+        void processEC2s(const QString &subnetId,
+                            const std::vector<Aws::EC2::Model::Reservation> &reservations);
 
-        void processRT(const QString &subnetId, const std::vector<Aws::EC2::Model::RouteTable> &RT);
+        /**
+         * @brief processRT - process RTs into approproiate subnet widget
+         * @param subnetId
+         * @param RT
+         */
+        void processRT(const QString &subnetId,
+                        const std::vector<Aws::EC2::Model::RouteTable> &RT);
 
-        void processACLs(const QString &subnetId, const std::vector<Aws::EC2::Model::NetworkAcl> &ACLs);
+        /**
+         * @brief processACLs - process ACLs into appropriate subnet widget
+         * @param subnetId
+         * @param ACLs
+         */
+        void processACLs(const QString &subnetId,
+                            const std::vector<Aws::EC2::Model::NetworkAcl> &ACLs);
 };
 
 #endif // SUBNETCARD_H

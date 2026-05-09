@@ -92,21 +92,24 @@ class VPCCard : public QFrame{
          * @brief processSubnets - adds subnets into appropriate subnet frame for given vpc id
          * @param subnets
          */
-        void processSubnets(const QString &vpcId, const std::vector<Aws::EC2::Model::Subnet> &subnets);
+        void processSubnets(const QString &vpcId,
+                                const std::vector<Aws::EC2::Model::Subnet> &subnets);
 
         /**
          * @brief processRTs - adds route tables into appropriate rt frame for given vpc id
          * @param vpcId
          * @param RTs
          */
-        void processRTs(const QString &vpcId, const std::vector<Aws::EC2::Model::RouteTable> &RTs);
+        void processRTs(const QString &vpcId,
+                            const std::vector<Aws::EC2::Model::RouteTable> &RTs);
 
         /**
          * @brief processIGW - adds internet gateway into appropriate igw frame for given vpc id
          * @param vpcId
          * @param IGW
          */
-        void processIGW(const QString &vpcId, const std::vector<Aws::EC2::Model::InternetGateway> &IGW);
+        void processIGW(const QString &vpcId,
+                            const std::vector<Aws::EC2::Model::InternetGateway> &IGW);
 
         /**
          * @brief expandTriggered - expand current vpc card to include
@@ -114,8 +117,16 @@ class VPCCard : public QFrame{
          */
         void vpcExpandTriggered();
 
+        /**
+         * @brief vpcMinimizeTriggered - minimize current vpc card to
+         * simple view
+         */
         void vpcMinimizeTriggered();
 
+        /**
+         * @brief deleteVPCButtonClicked - delete current vpc button
+         * triggered
+         */
         void deleteVPCButtonClicked();
 };
 
