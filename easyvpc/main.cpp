@@ -19,6 +19,7 @@ int main(int argc, char *argv[]){
 
     loginWindow.show();
 
+    // window switching on successful login
     QObject::connect(&loginWindow, &LoginWindow::loginIsSuccessful,
                         [&](){
         loginWindow.close();

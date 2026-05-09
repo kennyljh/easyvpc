@@ -785,7 +785,6 @@ void AWSManager::deleteRTsByVPCIdAsync(QString vpcID){
                     QMetaObject::invokeMethod(this, [this, err]() {
                         emit apiError(err);
                         qDebug() << err;
-                        return;
                     });
                 }
             }
@@ -819,8 +818,9 @@ void AWSManager::deleteRTsByVPCIdAsync(QString vpcID){
                     return;
                 });
             }
-
-            qDebug() << "Deleted RT: " + rtId;
+            QMetaObject::invokeMethod(this, [rtId]() {
+                qDebug() << "Deleted RT: " + rtId;
+            });
         }
 
         QMetaObject::invokeMethod(this, [this, vpcID]() {
@@ -863,7 +863,6 @@ void AWSManager::deleteIGWByVPCIdAsync(QString vpcID){
                 QMetaObject::invokeMethod(this, [this, err]() {
                     qDebug() << err;
                     emit apiError(err);
-                    return;
                 });
             }
 
@@ -885,7 +884,9 @@ void AWSManager::deleteIGWByVPCIdAsync(QString vpcID){
                     return;
                 });
             }
-            qDebug() << "Deleted IGW: " + igwId;
+            QMetaObject::invokeMethod(this, [igwId]() {
+                qDebug() << "Deleted IGW: " + igwId;
+            });
         }
 
         QMetaObject::invokeMethod(this, [this, vpcID]() {
@@ -925,7 +926,9 @@ void AWSManager::deleteSubnetsByVPCIdAsync(QString vpcID){
                     emit apiError(err);
                 });
             }
-            qDebug() << "Deleted subnet: " + subnet.GetSubnetId();
+            QMetaObject::invokeMethod(this, [subnet]() {
+                qDebug() << "Deleted subnet: " + subnet.GetSubnetId();
+            });
         }
 
         QMetaObject::invokeMethod(this, [this, vpcID]() {
@@ -964,7 +967,9 @@ void AWSManager::deleteVPCByVPCIdAsync(QString vpcID){
             });
             return;
         }
-        qDebug() << "Deleted VPC: " + vpcID;
+        QMetaObject::invokeMethod(this, [vpcID]() {
+            qDebug() << "Deleted VPC: " + vpcID;
+        });
 
         QMetaObject::invokeMethod(this, [this, vpcID]() {
             emit VPCDeletionCompleted(vpcID);

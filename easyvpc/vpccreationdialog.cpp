@@ -117,6 +117,7 @@ VPCCreationDialog::VPCCreationDialog(QWidget *parent)
             RTsLayout->addWidget(addRTBtn);
         createVPCLayout->addWidget(RTsLabel);
         createVPCLayout->addWidget(RTsFrame);
+        createVPCLayout->addWidget(new QLabel("Note: Each subnet can be associated with only one route table at a time."), Qt::AlignLeft);
         createVPCLayout->addSpacing(25);
 
             createBtn = new QPushButton("Create VPC", createVPCFrame);
@@ -256,7 +257,7 @@ void VPCCreationDialog::addRTFrame(){
     QLabel *RTNameLabel = new QLabel("Route Table Name", RTsFrame);
     QLineEdit *RTNameEdt = new QLineEdit(RTsFrame);
     RTNameEdt->setPlaceholderText("my-rt-01");
-    QPushButton *refreshSubnetsBtn = new QPushButton("Refresh Subnets");
+    QPushButton *refreshSubnetsBtn = new QPushButton("Refresh Subnets", RTsFrame);
     QListWidget *subnetsLWidget = new QListWidget(RTsFrame);
     connect(refreshSubnetsBtn, &QPushButton::clicked,
                 this, [this, subnetsLWidget](){

@@ -136,7 +136,9 @@ SetupInstructionDialog::SetupInstructionDialog(QWidget *parent)
         us-east-1
         </pre>
 
+        <p>
         Or, login to AWS >> IAM Identity Center >> Users >> Add user
+        </p>
 
         <hr>
 

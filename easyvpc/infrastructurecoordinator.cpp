@@ -194,8 +194,7 @@ void InfrastructureCoordinator::coordinateVPCInfrastructureDeletion(const QStrin
 void InfrastructureCoordinator::coordinateIGWDeletion(const QString &vpcID){
 
     QMetaObject::invokeMethod(this, [this]() {
-        emit coordinatorStageChanged("Route tables deleted... %p%", 30);
-        emit coordinatorStageChanged("Starting Internet Gateway deletion... %p%", 30);
+        emit coordinatorStageChanged("Route tables deleted. Starting Internet Gateway deletion... %p%", 30);
     });
     AWSManager::instance().deleteIGWByVPCIdAsync(vpcID);
 }
@@ -203,8 +202,7 @@ void InfrastructureCoordinator::coordinateIGWDeletion(const QString &vpcID){
 void InfrastructureCoordinator::coordinateSubnetsDeletion(const QString &vpcID){
 
     QMetaObject::invokeMethod(this, [this]() {
-        emit coordinatorStageChanged("Internet Gateway deleted... %p%", 60);
-        emit coordinatorStageChanged("Starting Subnets deletion... %p%", 60);
+        emit coordinatorStageChanged("Internet Gateway deleted. Starting Subnets deletion... %p%", 60);
     });
 
     AWSManager::instance().deleteSubnetsByVPCIdAsync(vpcID);
@@ -213,8 +211,7 @@ void InfrastructureCoordinator::coordinateSubnetsDeletion(const QString &vpcID){
 void InfrastructureCoordinator::coordinateVPCDeletion(const QString &vpcID){
 
     QMetaObject::invokeMethod(this, [this]() {
-        emit coordinatorStageChanged("Subnets deleted... %p%", 90);
-        emit coordinatorStageChanged("Starting VPC deletion... %p%", 90);
+        emit coordinatorStageChanged("Subnets deleted. Starting VPC deletion... %p%", 90);
     });
 
     AWSManager::instance().deleteVPCByVPCIdAsync(vpcID);
