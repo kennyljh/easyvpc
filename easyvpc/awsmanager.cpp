@@ -202,7 +202,7 @@ void AWSManager::getReservationsAsync(QString subnetID){
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
-                qDegub() << err;
+                qDebug() << err;
                 emit apiError(err);
             });
         }
@@ -779,7 +779,6 @@ void AWSManager::deleteRTsByVPCIdAsync(QString vpcID){
                 if (!outcome.IsSuccess()){
 
                     QString err = QString::fromStdString(
-                        qDebug() << err;
                         outcome.GetError().GetMessage()
                     );
 

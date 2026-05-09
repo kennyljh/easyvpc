@@ -7,35 +7,29 @@
 #include <QFrame>
 
 SetupInstructionDialog::SetupInstructionDialog(QWidget *parent)
-                       : QDialog(parent)
-{
+                       : QDialog(parent){
     setWindowTitle("EasyVPC Setup Instructions");
 
     resize(900, 650);
 
     setModal(true);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout = new QVBoxLayout(this);
 
-    QScrollArea *scrollArea = new QScrollArea(this);
+    scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
 
-    QWidget *container = new QWidget(scrollArea);
-
-    QVBoxLayout *containerLayout =
-        new QVBoxLayout(container);
-
+    container = new QWidget(scrollArea);
+    containerLayout = new QVBoxLayout(container);
     containerLayout->setContentsMargins(20, 20, 20, 20);
     containerLayout->setSpacing(15);
 
-    QLabel *instructions = new QLabel(container);
-
+    instructions = new QLabel(container);
     instructions->setWordWrap(true);
     instructions->setTextFormat(Qt::RichText);
     instructions->setOpenExternalLinks(true);
-    instructions->setTextInteractionFlags(
-        Qt::TextSelectableByMouse |
-        Qt::LinksAccessibleByMouse
+    instructions->setTextInteractionFlags(Qt::TextSelectableByMouse |
+                                          Qt::LinksAccessibleByMouse
     );
 
     instructions->setStyleSheet(R"(
@@ -142,6 +136,8 @@ SetupInstructionDialog::SetupInstructionDialog(QWidget *parent)
         us-east-1
         </pre>
 
+        Or, login to AWS >> IAM Identity Center >> Users >> Add user
+
         <hr>
 
         <h2>3. Configure AWS SSO Profile</h2>
@@ -178,7 +174,7 @@ SetupInstructionDialog::SetupInstructionDialog(QWidget *parent)
 
         <hr>
 
-        <h2>4. Login Using AWS SSO</h2>
+        <h2>4. Login Check Using AWS SSO</h2>
 
         <p>
         Run:
@@ -203,8 +199,7 @@ SetupInstructionDialog::SetupInstructionDialog(QWidget *parent)
         <ol>
         <li>Open EasyVPC</li>
         <li>Select your AWS profile</li>
-        <li>Select region</li>
-        <li>Click Login</li>
+        <li>Click Go</li>
         </ol>
 
         <hr>
@@ -234,17 +229,13 @@ SetupInstructionDialog::SetupInstructionDialog(QWidget *parent)
 
     containerLayout->addWidget(instructions);
 
-    QPushButton *closeBtn =
-        new QPushButton("Close", container);
-
+    closeBtn = new QPushButton("Close", container);
     closeBtn->setMinimumHeight(36);
 
     containerLayout->addWidget(closeBtn);
 
-    connect(closeBtn,
-            &QPushButton::clicked,
-            this,
-            &QDialog::accept);
+    connect(closeBtn, &QPushButton::clicked,
+                this, &QDialog::accept);
 
     scrollArea->setWidget(container);
 
