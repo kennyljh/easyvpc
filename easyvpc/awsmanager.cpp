@@ -72,6 +72,7 @@ void AWSManager::getRegionsAsync(){
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
         }
@@ -110,6 +111,7 @@ void AWSManager::getVPCsAsync(){
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
         }
@@ -156,6 +158,7 @@ void AWSManager::getSubnetsAsync(QString vpcID){
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
         }
@@ -199,6 +202,7 @@ void AWSManager::getReservationsAsync(QString subnetID){
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDegub() << err;
                 emit apiError(err);
             });
         }
@@ -239,6 +243,7 @@ void AWSManager::getRTAsync(QString subnetID){
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
         }
@@ -279,6 +284,7 @@ void AWSManager::getACLsAsync(QString subnetID){
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
         }
@@ -319,6 +325,7 @@ void AWSManager::getRTsByVPCIdAsync(QString vpcID){
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
         }
@@ -362,6 +369,7 @@ void AWSManager::getIGWByVPCIdAsync(QString vpcID){
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
         }
@@ -399,6 +407,7 @@ void AWSManager::getZonesAsync(){
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
         }
@@ -438,6 +447,7 @@ void AWSManager::createVPCAsync(QString vpcName, QString vpcCIDR){
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
             return;
@@ -521,6 +531,7 @@ void AWSManager::createSubnetAsync(QString vpcID,
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
             return;
@@ -528,8 +539,7 @@ void AWSManager::createSubnetAsync(QString vpcID,
 
         auto subnet = outcome.GetResult().GetSubnet();
 
-        QString subnetID =
-            QString::fromStdString(subnet.GetSubnetId());
+        QString subnetID = QString::fromStdString(subnet.GetSubnetId());
 
         // add name tag
         Aws::EC2::Model::CreateTagsRequest tagRequest;
@@ -587,6 +597,7 @@ void AWSManager::createIGWAsync(QString vpcID,
             QString err = QString::fromStdString(outcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
             return;
@@ -594,10 +605,7 @@ void AWSManager::createIGWAsync(QString vpcID,
 
         auto igw = outcome.GetResult().GetInternetGateway();
 
-        QString igwID =
-            QString::fromStdString(
-                igw.GetInternetGatewayId()
-            );
+        QString igwID = QString::fromStdString(igw.GetInternetGatewayId());
 
         // add name tag
         Aws::EC2::Model::CreateTagsRequest tagRequest;
@@ -627,6 +635,7 @@ void AWSManager::createIGWAsync(QString vpcID,
             QString err = QString::fromStdString(attachOutcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
             return;
@@ -640,9 +649,9 @@ void AWSManager::createIGWAsync(QString vpcID,
 }
 
 void AWSManager::createRTAsync(QString vpcID,
-                        QString RTName,
-                        QString igwID,
-                        QStringList subnetIDs){
+                                QString RTName,
+                                QString igwID,
+                                QStringList subnetIDs){
 
     QString profile = selectedProfile;
     QString region = selectedRegion;
@@ -668,6 +677,7 @@ void AWSManager::createRTAsync(QString vpcID,
             QString err = QString::fromStdString(rtOutcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
             return;
@@ -675,10 +685,7 @@ void AWSManager::createRTAsync(QString vpcID,
 
         auto rt = rtOutcome.GetResult().GetRouteTable();
 
-        QString rtID =
-            QString::fromStdString(
-                rt.GetRouteTableId()
-            );
+        QString rtID = QString::fromStdString(rt.GetRouteTableId());
 
         // add name tag
         Aws::EC2::Model::CreateTagsRequest tagRequest;
@@ -698,9 +705,7 @@ void AWSManager::createRTAsync(QString vpcID,
         Aws::EC2::Model::CreateRouteRequest routeRequest;
 
         routeRequest.SetRouteTableId(rt.GetRouteTableId());
-
         routeRequest.SetDestinationCidrBlock("0.0.0.0/0");
-
         routeRequest.SetGatewayId(igwID.toStdString());
 
         auto routeOutcome = ec2.CreateRoute(routeRequest);
@@ -710,6 +715,7 @@ void AWSManager::createRTAsync(QString vpcID,
             QString err = QString::fromStdString(routeOutcome.GetError().GetMessage());
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
             return;
@@ -721,7 +727,6 @@ void AWSManager::createRTAsync(QString vpcID,
             Aws::EC2::Model::AssociateRouteTableRequest assocRequest;
 
             assocRequest.SetRouteTableId(rt.GetRouteTableId());
-
             assocRequest.SetSubnetId(subnetID.toStdString());
 
             auto assocOutcome = ec2.AssociateRouteTable(assocRequest);
@@ -730,7 +735,8 @@ void AWSManager::createRTAsync(QString vpcID,
 
                 QString err = QString::fromStdString(assocOutcome.GetError().GetMessage());
 
-                QMetaObject::invokeMethod(this, [=]() {
+                QMetaObject::invokeMethod(this, [this, err]() {
+                    qDebug() << err;
                     emit apiError(err);
                 });
                 return;
@@ -763,17 +769,6 @@ void AWSManager::deleteRTsByVPCIdAsync(QString vpcID){
 
             auto rtId = rt.GetRouteTableId();
 
-            bool isMain = false;
-            for (const auto &assoc : rt.GetAssociations()){
-
-                if (assoc.GetMain()){
-
-                    isMain = true;
-                    break;
-                }
-            }
-            if (isMain) continue;
-
             // disassociate associations
             for (const auto &assoc : rt.GetAssociations()){
 
@@ -784,15 +779,29 @@ void AWSManager::deleteRTsByVPCIdAsync(QString vpcID){
                 if (!outcome.IsSuccess()){
 
                     QString err = QString::fromStdString(
+                        qDebug() << err;
                         outcome.GetError().GetMessage()
                     );
 
                     QMetaObject::invokeMethod(this, [this, err]() {
                         emit apiError(err);
+                        qDebug() << err;
                         return;
                     });
                 }
             }
+
+            // can't detele RT if main
+            bool isMain = false;
+            for (const auto &assoc : rt.GetAssociations()){
+
+                if (assoc.GetMain()){
+
+                    isMain = true;
+                    break;
+                }
+            }
+            if (isMain) continue;
 
             // delete RT
             Aws::EC2::Model::DeleteRouteTableRequest delReq;
@@ -806,6 +815,7 @@ void AWSManager::deleteRTsByVPCIdAsync(QString vpcID){
                 );
 
                 QMetaObject::invokeMethod(this, [this, err]() {
+                    qDebug() << err;
                     emit apiError(err);
                     return;
                 });
@@ -843,14 +853,39 @@ void AWSManager::deleteIGWByVPCIdAsync(QString vpcID){
             detachReq.SetInternetGatewayId(igwId);
             detachReq.SetVpcId(vpcID.toStdString());
 
-            ec2.DetachInternetGateway(detachReq);
+            auto detachOutcome = ec2.DetachInternetGateway(detachReq);
+
+            if (!detachOutcome.IsSuccess()){
+
+                QString err = QString::fromStdString(
+                    detachOutcome.GetError().GetMessage()
+                );
+
+                QMetaObject::invokeMethod(this, [this, err]() {
+                    qDebug() << err;
+                    emit apiError(err);
+                    return;
+                });
+            }
 
             // delete igw
             Aws::EC2::Model::DeleteInternetGatewayRequest delReq;
             delReq.SetInternetGatewayId(igwId);
 
-            ec2.DeleteInternetGateway(delReq);
+            auto deleteOutcome = ec2.DeleteInternetGateway(delReq);
 
+            if (!deleteOutcome.IsSuccess()){
+
+                QString err = QString::fromStdString(
+                    deleteOutcome.GetError().GetMessage()
+                );
+
+                QMetaObject::invokeMethod(this, [this, err]() {
+                    qDebug() << err;
+                    emit apiError(err);
+                    return;
+                });
+            }
             qDebug() << "Deleted IGW: " + igwId;
         }
 
@@ -887,6 +922,7 @@ void AWSManager::deleteSubnetsByVPCIdAsync(QString vpcID){
                 );
 
                 QMetaObject::invokeMethod(this, [this, err]() {
+                    qDebug() << err;
                     emit apiError(err);
                 });
             }
@@ -924,6 +960,7 @@ void AWSManager::deleteVPCByVPCIdAsync(QString vpcID){
             );
 
             QMetaObject::invokeMethod(this, [this, err]() {
+                qDebug() << err;
                 emit apiError(err);
             });
             return;

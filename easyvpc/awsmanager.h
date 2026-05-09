@@ -10,7 +10,10 @@
 
 /**
  * @brief The AWSManager class - singleton, is responsible for all
- * asynchronous API calls using the AWS SDK
+ * asynchronous API calls using the AWS SDK.
+ *
+ * Emits signals on async call completion, both successes and
+ * failures.
  */
 class AWSManager : public QObject {
     Q_OBJECT
@@ -30,6 +33,10 @@ class AWSManager : public QObject {
             // std::vector<Aws::EC2::Model::NetworkAcl> acls;
         };
 
+        /**
+         * @brief vpcIDCache vpc id to vpc details cache for all vpcs
+         * discovered
+         */
         QMap<QString, vpcDetails> vpcIDCache;
 
         /**
@@ -38,6 +45,10 @@ class AWSManager : public QObject {
          */
         void initSDK();
 
+        /**
+         * @brief terminateSDK - terminates SDK, should ony be called
+         * once
+         */
         void terminateSDK();
 
         /**
@@ -116,10 +127,28 @@ class AWSManager : public QObject {
          */
         void getIGWByVPCIdAsync(QString vpcID);
 
+        /**
+         * @brief getZonesAsync - makes async call to get AZs for
+         * current region
+         */
         void getZonesAsync();
 
+        /**
+         * @brief createVPCAsync - makes async call to create VPC
+         * for current region & profile
+         * @param vpcName
+         * @param vpcCIDR
+         */
         void createVPCAsync(QString vpcName, QString vpcCIDR);
 
+        /**
+         * @brief createSubnetAsync - makes async call to create
+         * subnet for current region, profile, and VPC
+         * @param vpcID
+         * @param subnetName
+         * @param zone
+         * @param CIDR
+         */
         void createSubnetAsync(
             QString vpcID,
             QString subnetName,
@@ -127,11 +156,25 @@ class AWSManager : public QObject {
             QString CIDR
         );
 
+        /**
+         * @brief createIGWAsync - makes async call to create
+         * IGW for current region, profile, and VPC
+         * @param vpcID
+         * @param igwName
+         */
         void createIGWAsync(
             QString vpcID,
             QString igwName
         );
 
+        /**
+         * @brief createRTAsync - makes async call to create
+         * RT for current region, profile, and VPC
+         * @param vpcID
+         * @param RTName
+         * @param igwID
+         * @param subnetIDs
+         */
         void createRTAsync(
             QString vpcID,
             QString RTName,
@@ -139,12 +182,32 @@ class AWSManager : public QObject {
             QStringList subnetIDs
         );
 
+        /**
+         * @brief deleteRTsByVPCIdAsync - makes async call
+         * to delete RTs for current VPC
+         * @param vpcID
+         */
         void deleteRTsByVPCIdAsync(QString vpcID);
 
+        /**
+         * @brief deleteIGWByVPCIdAsync - makes async call
+         * to delete IGW for current VPC
+         * @param vpcID
+         */
         void deleteIGWByVPCIdAsync(QString vpcID);
 
+        /**
+         * @brief deleteSubnetsByVPCIdAsync - makes async
+         * call to delete subnets for current VPC
+         * @param vpcID
+         */
         void deleteSubnetsByVPCIdAsync(QString vpcID);
 
+        /**
+         * @brief deleteVPCByVPCIdAsync - makes async call
+         * to delete VPC by id
+         * @param vpcID
+         */
         void deleteVPCByVPCIdAsync(QString vpcID);
 
 
@@ -165,43 +228,54 @@ class AWSManager : public QObject {
          * @brief subnetsReady - signals when list of subnets retrieved for vpc id
          * @param subnets
          */
-        void subnetsReady(const QString &vpcId, const std::vector<Aws::EC2::Model::Subnet> &subnets);
+        void subnetsReady(const QString &vpcId,
+                            const std::vector<Aws::EC2::Model::Subnet> &subnets);
 
         /**
          * @brief reservationsByIdReady - signals when reservations retrieved for subnet id
          * @param subnetId
          * @param reservations
          */
-        void reservationsByIdReady(const QString &subnetId, const std::vector<Aws::EC2::Model::Reservation> &reservations);
+        void reservationsByIdReady(const QString &subnetId,
+                                    const std::vector<Aws::EC2::Model::Reservation> &reservations);
 
         /**
          * @brief RTByIdReady - signals when RT retrieved for subnet id
          * @param subnetId
          * @param RT
          */
-        void RTByIdReady(const QString &subnetId, const std::vector<Aws::EC2::Model::RouteTable> &RT);
+        void RTByIdReady(const QString &subnetId,
+                            const std::vector<Aws::EC2::Model::RouteTable> &RT);
 
         /**
          * @brief ACLsByIdReady - signals when ACLs retrieved for subnet id
          * @param subnetId
          * @param ACLs
          */
-        void ACLsByIdReady(const QString &subnetId, const std::vector<Aws::EC2::Model::NetworkAcl> &ACLs);
+        void ACLsByIdReady(const QString &subnetId,
+                            const std::vector<Aws::EC2::Model::NetworkAcl> &ACLs);
 
         /**
          * @brief RTsByVPCIdReady - signals when RT retrieved for vpc id
          * @param vpcId
          * @param RTs
          */
-        void RTsByVPCIdReady(const QString &vpcId, const std::vector<Aws::EC2::Model::RouteTable> &RTs);
+        void RTsByVPCIdReady(const QString &vpcId,
+                                const std::vector<Aws::EC2::Model::RouteTable> &RTs);
 
         /**
          * @brief IGWByVPCIdReady - signals when IGW retrieved for vpc id
          * @param vpcId
          * @param IGW
          */
-        void IGWByVPCIdReady(const QString &vpcId, const std::vector<Aws::EC2::Model::InternetGateway> &IGW);
+        void IGWByVPCIdReady(const QString &vpcId,
+                                const std::vector<Aws::EC2::Model::InternetGateway> &IGW);
 
+        /**
+         * @brief zonesReady - signals when retrieved availability
+         * zones for current region
+         * @param zones
+         */
         void zonesReady(const std::vector<Aws::EC2::Model::AvailabilityZone> &zones);
 
         /**
@@ -216,21 +290,61 @@ class AWSManager : public QObject {
          */
         void notifyStatus(const QString &status);
 
+        /**
+         * @brief vpcCreated - signals when vpc is created
+         * @param vpcID
+         */
         void vpcCreated(const QString &vpcID);
 
+        /**
+         * @brief subnetCreated - signals when subnet for
+         * current vpc is created and associated
+         * @param subnetID
+         * @param subnetName
+         */
         void subnetCreated(const QString &subnetID,
                             const QString &subnetName);
 
+        /**
+         * @brief igwCreated - signals when IGW for
+         * current vpc is created and associated
+         * @param igwID
+         */
         void igwCreated(const QString &igwID);
 
+        /**
+         * @brief routeTableCreated - signals when RT
+         * for current vpc is created and associated
+         * @param rtID
+         */
         void routeTableCreated(const QString &rtID);
 
+        /**
+         * @brief RTsDeletionCompleted - signals when
+         * RTs for current vpc are deleted
+         * @param vpcID
+         */
         void RTsDeletionCompleted(const QString &vpcID);
 
+        /**
+         * @brief IGWDeletionCompleted - signals when IGW
+         * for current vpc is deleted
+         * @param vpcID
+         */
         void IGWDeletionCompleted(const QString &vpcID);
 
+        /**
+         * @brief SubnetsDeletionCompleted - signals when subnets
+         * for current vpc are deleted
+         * @param vpcID
+         */
         void SubnetsDeletionCompleted(const QString &vpcID);
 
+        /**
+         * @brief VPCDeletionCompleted - signals when vpc is
+         * deleted
+         * @param vpcID
+         */
         void VPCDeletionCompleted(const QString &vpcID);
 
     private:
