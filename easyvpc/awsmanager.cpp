@@ -977,21 +977,3 @@ void AWSManager::deleteVPCByVPCIdAsync(QString vpcID){
     });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
