@@ -59,10 +59,25 @@ class VPCWindow : public QMainWindow{
 
         void refreshButtonClicked();
 
+        /**
+         * @brief createVPCButtonClicked - initiates vpc creation dialog
+         * popup and infrastructure coordinator setup
+         */
         void createVPCButtonClicked();
 
+        /**
+         * @brief regionChangeTriggered - reconfigure current region and
+         * refresh vpcs
+         * @param region
+         */
         void regionChangeTriggered(const QString &region);
 
+        /**
+         * @brief coordinatorUpdated - update progress bar based
+         * on coordinator stage change
+         * @param msg
+         * @param val
+         */
         void coordinatorUpdated(const QString &msg, const int &val);
 
         /**
