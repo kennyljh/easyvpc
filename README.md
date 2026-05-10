@@ -17,12 +17,12 @@ Just run EasyVPC-x86_64.AppImage.
 
 ## You may run the following if needed:
 ```bash
-$chmod a+x EasyVPC-x86_64.AppImage
+chmod a+x EasyVPC-x86_64.AppImage
 ```
 
 ## To use debug mode, run the application through a bash shell:
 ```bash
-$./EasyVPC-x86_64.AppImage
+./EasyVPC-x86_64.AppImage
 ```
 
 ## Version:
