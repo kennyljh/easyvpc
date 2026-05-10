@@ -1,6 +1,6 @@
-#EasyVPC - an application for VPC management
+# EasyVPC - an application for VPC management
 
-##About:
+## About:
 EasyVPC is an application that can support VPC provisioning for AWS.
 Current version supports VPC provisioning with multiple subnets, route tables 
 and an IGW.
@@ -12,19 +12,19 @@ a VPC is associated with any other resources.
 This application requires AWS SSO and CLI to work. You can find instructions
 for these through the Help button on application startup.
 
-##Usage:
+## Usage:
 Just run EasyVPC-x86_64.AppImage.
 
-##You may run the following if needed:
+## You may run the following if needed:
 ```bash
 $chmod a+x EasyVPC-x86_64.AppImage
 ```
 
-##To use debug mode, run the application through a bash shell:
+## To use debug mode, run the application through a bash shell:
 ```bash
 $./EasyVPC-x86_64.AppImage
 ```
 
-##Version:
+## Version:
 The application was build on Linux Mint 22. It should be able to run
 on Ubuntu 22.04, Linux Mint 21, Debian 12 or newer.
