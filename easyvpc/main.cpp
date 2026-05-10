@@ -2,12 +2,18 @@
 #include <vpcwindow.h>
 #include <QFile>
 #include <QObject>
+#include <QIcon>
 #include "loginwindow.h"
 #include "awsmanager.h"
 
 int main(int argc, char *argv[]){
 
     QApplication app(argc, argv);
+
+    QApplication::setApplicationName("EasyVPC");
+    QApplication::setDesktopFileName("easyvpc");
+
+    app.setWindowIcon(QIcon(":/icons/logo.png"));
 
     QFile file(":/styles/styles.qss");
     if (file.open(QFile::ReadOnly)) app.setStyleSheet(QLatin1String(file.readAll()));
