@@ -1,0 +1,329 @@
+commit 49606943c8ab0efc7e707110c8ff009210f0a372
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 23:46:52 2026 -0500
+
+    added easyvpc build
+
+commit 80aeb6cb01dd5c47b5746ff351eaf32c825e2b81
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 23:17:14 2026 -0500
+
+    modified gitignore
+
+commit c4780b19e063a73d569a4a6f449eb54b6228c5ff
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 19:34:28 2026 -0500
+
+    added easyvpc logo
+
+commit d449b08a0a83cff2130a0241236ba60e8afa4b62
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 18:09:52 2026 -0500
+
+    fixed vpc deletion pipeline bug
+
+commit f38d521db5c143036d764ddac263c2848b63eac6
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 17:53:58 2026 -0500
+
+    infrastructureCoordinator documentation. fixed progress bar update bug
+
+commit cad0a8f1f64817316b3b500c150e75160e7d32c9
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 17:28:48 2026 -0500
+
+    minor awsmanager edit
+
+commit 31ada7f420012fe42227856a45b4ce750fa522dc
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 17:22:00 2026 -0500
+
+    fixed progress bar update bug
+
+commit 76638f83b60375040304e66891e745ec7232b74e
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 16:42:38 2026 -0500
+
+    vpcwindow documentation
+
+commit e79efc5cae83a767b3e3f9a0e60a4451da67b9f5
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 16:31:07 2026 -0500
+
+    vpc creation dialog documentation
+
+commit 8c84ac2932302625ab1d7cd63182ac8c2cb511b2
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 16:28:27 2026 -0500
+
+    vpccard documentation
+
+commit df055747a16d609d1e5640ae8c2cb46cad123779
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 16:24:40 2026 -0500
+
+    setup instructions minor edit
+
+commit 47d79885fd9ee29f001463ac424ca6f9a4e6bdb4
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 16:11:24 2026 -0500
+
+    loginwindow minor debug asjustments
+
+commit 4903565977fb8451ef9a2e1f42c2a12876710957
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 16:07:29 2026 -0500
+
+    added insfrastructure coordinatior documentation and minor gui updates
+
+commit a8b1883b5cb1459f6a26f3c971c3cda035fb7066
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Sat May 9 15:40:31 2026 -0500
+
+    documentation for awsmanager
+
+commit dee00f1a3d84726e0ecbe46b562c095834b14bd8
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Fri May 8 07:38:07 2026 -0500
+
+    resolved lambda function issues
+
+commit 6717e7df1d8140fbb68dcd4a5c774f38395bbfaf
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Fri May 8 07:14:50 2026 -0500
+
+    resolved stale cache problem. ensure emit runs on main gui thread
+
+commit 8a5e1a1271afb03d6ee62b9f85cc7cd98e7941c0
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Fri May 8 06:00:18 2026 -0500
+
+    tested vpc deletion pipeline
+
+commit 78e21c98b2aaa7a26f56b742c788bc53a8a2f4eb
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Fri May 8 05:42:23 2026 -0500
+
+    connected delete vpc button to coordinator
+
+commit df606de3d4aa5301d4dc34d2c240e0cd9ef6c63b
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Fri May 8 05:03:24 2026 -0500
+
+    added async calls for rt, igw, subnets and vpc deletion
+
+commit 50fe24c2867bde3c9cf37ab6a1c8a89bcabf0383
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Fri May 8 04:14:49 2026 -0500
+
+    delegated caching to awsmanager
+
+commit 337ec6b0e7b47028955433a5510d31a2305f17d8
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Fri May 8 03:33:24 2026 -0500
+
+    integrated flow from login to vpc window. delegating caching responsibilites
+
+commit dc11b7183ca1a404d092699c9349e3d19693fdad
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Fri May 8 01:42:20 2026 -0500
+
+    added progressbar for vpc creation
+
+commit 2132320e8d94a63629a5e01a452171d80926b3de
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Fri May 8 00:57:49 2026 -0500
+
+    tested vpc creation pipeline
+
+commit 9d994901a896e11b593a632ba6a37e64e1f997f2
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 23:51:34 2026 -0500
+
+    added region change
+
+commit b8198dd347098b3217448f888f881c79b7078839
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 23:39:19 2026 -0500
+
+    added increase rt for vpc creation
+
+commit 5327972d8b4377dff19cc26a3c8e4df7a6b8269b
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 22:59:04 2026 -0500
+
+    added increase subnet for vpc creation
+
+commit 9e6a732e3fdd1689f039c22e22ec4b7856b32565
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 21:52:37 2026 -0500
+
+    resoled app not compiling. added async call for availability zones
+
+commit 6f03553336071ee724be4e5a157c3168a431f638
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 21:28:48 2026 -0500
+
+    added async call for rt creation
+
+commit 5f28c913e2ea0d5930b6e707f0fdfae7e3e9d0f9
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 20:55:55 2026 -0500
+
+    added async calls for vpc, subnets, and igw creation
+
+commit 252dbb99a22e3868828f8917538c2ca812a260b0
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 19:17:06 2026 -0500
+
+    created infrastructure coordinator skeleton. added vpc creation async call skeleton
+
+commit caeb54dd5b01bd95c22d5816ca76ae99bfb369ce
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 18:22:40 2026 -0500
+
+    added subnet refresh for vpc dialog
+
+commit effd73805598821b2d48fc03b22d96d6d5a51a6c
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 18:12:04 2026 -0500
+
+    tested vpc creation request data transfer between dialog and window
+
+commit cab8895dee55cb50dd69b4e7ab2532f7060394cc
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 16:12:56 2026 -0500
+
+    added vpc creation dialog skeleton
+
+commit c23ad41903a9f39f598e86f2f009dc0bd5dc0d74
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 05:04:58 2026 -0500
+
+    resolved merge conflict
+
+commit 8bade4d2a37826d996a786f864ebd90f7dec39d1
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 04:56:05 2026 -0500
+
+    added igw frame. added async call for igw. added igw insertion into frame
+
+commit 5b71c9d87deb846062d522ff996571d5d3905bbc
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 02:58:34 2026 -0500
+
+    added async calls for retrieving RTs based on vpc id. added RT insertion into appropriate frames
+
+commit 3581b1ed557e6e1f79f7af610630bbe0720fbb89
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 01:25:21 2026 -0500
+
+    added rt card skeleton
+
+commit 54e1503c783b2f8be82e8c9c3ad194596c474faa
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Thu May 7 00:34:04 2026 -0500
+
+    tested async call for RTs and ACLs. added RT and ACLs insertion into appropriate frame. modified subnet card layout
+
+commit ca10cac0ee528019a9c06edf28d0236ab4fc1b17
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Wed May 6 21:03:11 2026 -0500
+
+    added notification signal for vpccard. resolved crash when no subnets found
+
+commit 5df4eb3bef1bf8e477fb43de2cfc21eeaca9ea1a
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Wed May 6 19:59:38 2026 -0500
+
+    tested async call for ec2 retrieval. tested ec2 insertion into frame
+
+commit 01f474d2a0d4a257e5e84891cd6372102503ec1e
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Wed May 6 18:45:20 2026 -0500
+
+    added ec2, rts and acls skeleton to subnet card. added async function to retrieve ec2s based on subnet id
+
+commit c9b630a78e53f879cba8323062269af2d692509f
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Wed May 6 15:37:44 2026 -0500
+
+    added minimize button for vpc cards. moved widget fader to separate class
+
+commit 9d8f7ebdc5e4d66c612d2ff39f2684b4475bc31c
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Wed May 6 09:08:50 2026 -0500
+
+    fixed animation not working if applied to both parent and child widgets
+
+commit 615370f3f4a289e1aa5b7dbd5ecad4c86003496d
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Wed May 6 07:38:29 2026 -0500
+
+    added fade to widgets. need to move gui updating to main thread for safety
+
+commit 49c3dd813da5370726fbb15e7e8e15a10a9fea85
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Wed May 6 05:36:26 2026 -0500
+
+    added scrollarea to subnets frame
+
+commit b04ab807c9c669e8c9192542b53db356270d400d
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Wed May 6 05:12:36 2026 -0500
+
+    tested async call for subnet retrieval. added vpc id checking for updating correct subnet frame upon receiving signal
+
+commit cf1ace1fcc53b88975f2d85979a9a0239ddb86d0
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Wed May 6 00:48:18 2026 -0500
+
+    added async call for regions retrieval. added combobox update based on retrieved regions
+
+commit 719f3aa12fc4383d608140b91a05e201b2060293
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Wed May 6 00:28:54 2026 -0500
+
+    added async call for retrieving subnets
+
+commit a1adad62a6526ba3c374c1cefcd897a7018e79c0
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Wed May 6 00:17:08 2026 -0500
+
+    added skeleton for subnet frame
+
+commit 543e7440137a5f09c0c6966e102d2a87ca8acaf1
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Tue May 5 22:21:36 2026 -0500
+
+    made api call to retrieve vpcs async. added new signals to vpcwindow.h for ui update
+
+commit 299b27b2db3e2d4874bc692d37edd8f86dbac0b0
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Tue May 5 00:50:44 2026 -0500
+
+    added aws singleton. api calls to retrieve vpc information successful. modified vpc card layout
+
+commit f15c40346ae49b225f604df5daf1ee27a0db3e82
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Mon May 4 19:24:57 2026 -0500
+
+    tested scrollarea with vpccards. changed dockwidget to qframe. added new qframe for welcome message, sort and expand buttons. modified vpccards appearance
+
+commit 957669bb63ba53d9787a4e1fea42c871d8a45eac
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Mon May 4 17:35:32 2026 -0500
+
+    aws sso login with aws cli successful. added skeleton for vpcwindow and vpccards
+
+commit 294d58c8cd4e7b6d7c72b9ea610d2edc7eea4755
+Author: Kenny <kennyljh@iastate.edu>
+Date:   Fri Apr 24 03:32:46 2026 -0500
+
+    added skeleton for loginwindow, added aws sdk
+
+commit 8afc766142a32d23532a9b08a3182b5b1c842211
+Author: Kenny <146586200+kennyljh@users.noreply.github.com>
+Date:   Thu Apr 23 14:11:16 2026 -0500
+
+    Initial commit
