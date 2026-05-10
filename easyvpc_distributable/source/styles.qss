@@ -1,0 +1,16 @@
+QFrame#blueQFrame {
+    border: 1px solid #4287f5;
+    border-radius: 5px;
+}
+
+QLabel#easyVPCLabel {
+    border: 0px solid transparent;
+    border-bottom: 3px solid #037ffc;
+    font-size: 20px;
+    font-weight: bold;
+    font-style: italic;
+    padding: 3px;
+    background-color: #0b2a6e;
+    border-radius: 5px;
+    color: white;
+}
